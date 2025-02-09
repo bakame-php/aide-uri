@@ -1,0 +1,15 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+parameters:
+    ignoreErrors:
+    level: max
+    paths:
+        - src
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: false
+    parallel:
+        processTimeout: 300.0
+
