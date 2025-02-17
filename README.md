@@ -7,3 +7,5 @@ The URI object uses [League URI Interface Package](https://github.com/thephpleag
 
 The main difference is that the polyfill handles RFC3987 i18n host resolution in addition to RFC3986.
 Please view the RFC document to understand the URI instance public API.
+
+The Polyfill for the WHATWG URL from the RFC is still missing.
