@@ -14,6 +14,9 @@ final class UriTest extends TestCase
     #[Test]
     public function it_can_parse_an_uri(): void
     {
-        self::assertSame('http://example.com', Uri::parse('http://example.com')->toString());
+        $uri = Uri::parse('http://example.com');
+
+        self::assertSame('http://example.com', $uri->toRawString());
+        self::assertSame('http://example.com/', $uri->toString());
     }
 }

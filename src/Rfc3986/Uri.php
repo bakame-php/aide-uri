@@ -62,11 +62,13 @@ final class Uri
      */
     private function initUri(string $uri): array
     {
+        /** @var Components $defaults */
         static $defaults = [
             'scheme' => null, 'userInfo' => null, 'user' => null, 'pass' => null, 'host' => null,
             'port' => null, 'path' => null, 'query' => null, 'fragment' => null,
         ];
 
+        /** @var Components $components */
         $components = [...$defaults, ...UriString::parse($uri)];
         if ('' === $components['path']) {
             $components['path'] = null;
@@ -81,7 +83,7 @@ final class Uri
             return $components;
         }
 
-        $components['userInfo'] .= ':' . $components['pass'];
+        $components['userInfo'] .= ':'.$components['pass'];
 
         return $components;
     }
@@ -91,7 +93,7 @@ final class Uri
      */
     private function assertIsInitialized(): void
     {
-        $this->isInitialized || throw new UninitializedUriException('Object of type ' . self::class . ' has not been correctly initialized.');
+        $this->isInitialized || throw new UninitializedUriException('Object of type '.self::class.' has not been correctly initialized.');
     }
 
     /**
@@ -164,8 +166,7 @@ final class Uri
             return $this;
         }
 
-        [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null];
-        /* @phpstan-ignore-line */
+        [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null]; /* @phpstan-ignore-line */
 
         return new self(UriString::build([...$this->components, ...['user' => $user, 'password' => $password]]));
     }
