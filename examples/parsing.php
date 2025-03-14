@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use Bakame\Polyfill\Rfc3986\Uri;
 
@@ -14,6 +14,7 @@ $uriList = [
     "https://%e4%bd%a0%e5%a5%bd%e4%bd%a0%e5%a5%bd.com",
     "HTTPS://////EXAMPLE.com",
     'HTTPS://EXAMPLE.com',
+    "https://example.com/foo/bar%2Fbaz",
 ];
 
 foreach ($uriList as $uriString) {
@@ -31,12 +32,12 @@ foreach ($uriList as $uriString) {
         'raw passoword' => $uri->getRawPassword(),
         'host' => $uri->getHost(),
         'raw host' => $uri->getRawHost(),
-        'display host' => $uri->getHostForDisplay(),
         'path' => $uri->getPath(),
         'raw path' => $uri->getRawPath(),
         'query' => $uri->getQuery(),
         'raw query' => $uri->getRawQuery(),
         'fragment' => $uri->getFragment(),
         'raw fragment' => $uri->getRawFragment(),
+        'serializable' => unserialize(serialize($uri))->toNormalizedString(),
     ]);
 }

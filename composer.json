@@ -12,15 +12,17 @@
     ],
     "autoload": {
         "psr-4": {
-            "Bakame\\Polyfill\\Rfc3986\\": "src"
+            "Bakame\\Polyfill\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Bakame\\Polyfill\\Rfc3986\\": "tests/"
+            "Bakame\\Polyfill\\": "tests/"
         }
     },
     "require": {
+        "league/uri-components": "dev-master",
+        "league/uri": "dev-master",
         "league/uri-interfaces": "dev-master"
     },
     "require-dev": {
