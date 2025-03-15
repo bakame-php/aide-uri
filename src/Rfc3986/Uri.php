@@ -340,19 +340,6 @@ final class Uri
     /**
      * @throws UninitializedUriException|InvalidUriException
      */
-    public function normalize(): self
-    {
-        $this->assertIsInitialized();
-        if ($this->normalizedUri === $this->uri) {
-            return $this;
-        }
-
-        return new self($this->normalizedUri);
-    }
-
-    /**
-     * @throws UninitializedUriException
-     */
     public function equals(self $uri, bool $excludeFragment = true): bool
     {
         $this->assertIsInitialized();
@@ -361,16 +348,6 @@ final class Uri
         }
 
         return $this->normalizedUri === $uri->normalizedUri;
-    }
-
-    /**
-     * @throws UninitializedUriException
-     */
-    public function toString(): string
-    {
-        $this->assertIsInitialized();
-
-        return $this->normalizedUri;
     }
 
     /**
@@ -385,6 +362,16 @@ final class Uri
 
     /**
      * @throws UninitializedUriException
+     */
+    public function toString(): string
+    {
+        $this->assertIsInitialized();
+
+        return $this->normalizedUri;
+    }
+
+    /**
+     * @throws UninitializedUriException|InvalidUriException
      */
     public function resolve(string $uri): self
     {
