@@ -12,12 +12,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Bakame\\Polyfill\\": "src"
+            "Bakame\\Polyfill\\Rfc3986\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Bakame\\Polyfill\\": "tests/"
+            "Bakame\\Polyfill\\Rfc3986\\": "tests/"
         }
     },
     "require": {

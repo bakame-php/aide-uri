@@ -20,8 +20,8 @@ $uriList = [
 foreach ($uriList as $uriString) {
     $uri = new Uri($uriString);
     dump([
-        'uri' => $uri->toString(),
-        'normalized uri' => $uri->toNormalizedString(),
+        'uri' => $uri->toRawString(),
+        'normalized uri' => $uri->toString(),
         'scheme' => $uri->getScheme(),
         'raw scheme' => $uri->getRawScheme(),
         'user info' => $uri->getUserInfo(),
@@ -38,6 +38,6 @@ foreach ($uriList as $uriString) {
         'raw query' => $uri->getRawQuery(),
         'fragment' => $uri->getFragment(),
         'raw fragment' => $uri->getRawFragment(),
-        'serializable' => unserialize(serialize($uri))->toNormalizedString(),
+        'serializable' => unserialize(serialize($uri))->toString(),
     ]);
 }
