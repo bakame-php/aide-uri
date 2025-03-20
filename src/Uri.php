@@ -17,10 +17,8 @@ use Exception;
 use League\Uri\Encoder;
 use League\Uri\UriString;
 use SensitiveParameter;
-use SensitiveParameterValue;
 use Throwable;
 
-use function class_exists;
 use function explode;
 use function preg_match;
 use function str_contains;
@@ -496,13 +494,6 @@ final class Uri
 
         $components = $this->rawComponents;
         unset($components['userInfo']);
-
-        // the pass component is retracted from the output
-        // whenever the user component is set for security
-        // reason to avoid leaking its value
-        if (isset($components['user'])) {
-            $components['pass'] = class_exists(SensitiveParameterValue::class) ? new SensitiveParameterValue($components['pass']) : '****';
-        }
 
         return $components;
     }
