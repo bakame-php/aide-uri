@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Bakame\Polyfill\Rfc3986;
 
-class UriOperationException extends UriException
+use Error;
+
+class UriError extends Error
 {
 }

@@ -89,18 +89,17 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     private function assertIsInitialized(): void
     {
-        $this->isInitialized || throw new UninitializedUriException('Object of type '.self::class.' has not been correctly initialized.');
+        $this->isInitialized || throw new UninitializedUriError('Object of type '.self::class.' has not been correctly initialized.');
     }
 
     /**
      * @param self::TYPE_RAW|self::TYPE_NORMALIZED $type
      *
-     * @throws UninitializedUriException
-     *
+     * @throws UninitializedUriError
      */
     private function get(string $component, string $type): ?string
     {
@@ -114,7 +113,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getScheme(): ?string
     {
@@ -122,7 +121,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawScheme(): ?string
     {
@@ -130,7 +129,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withScheme(?string $encodedScheme): self
     {
@@ -142,7 +141,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getUserInfo(): ?string
     {
@@ -150,7 +149,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawUserInfo(): ?string
     {
@@ -158,7 +157,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withUserInfo(?string $encodedUserInfo): self
     {
@@ -172,7 +171,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawUser(): ?string
     {
@@ -180,7 +179,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getUser(): ?string
     {
@@ -188,7 +187,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawPassword(): ?string
     {
@@ -196,7 +195,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getPassword(): ?string
     {
@@ -204,7 +203,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawHost(): ?string
     {
@@ -212,7 +211,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getHost(): ?string
     {
@@ -220,7 +219,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withHost(?string $encodedHost): self
     {
@@ -232,7 +231,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getPort(): ?int
     {
@@ -242,7 +241,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withPort(?int $port): self
     {
@@ -254,7 +253,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawPath(): ?string
     {
@@ -262,7 +261,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getPath(): ?string
     {
@@ -270,7 +269,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withPath(?string $encodedPath): self
     {
@@ -282,7 +281,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawQuery(): ?string
     {
@@ -290,7 +289,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getQuery(): ?string
     {
@@ -298,7 +297,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withQuery(?string $encodedQuery): self
     {
@@ -310,7 +309,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getRawFragment(): ?string
     {
@@ -318,7 +317,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function getFragment(): ?string
     {
@@ -326,7 +325,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function withFragment(?string $encodedFragment): self
     {
@@ -338,20 +337,20 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function equals(self $uri, bool $excludeFragment = true): bool
     {
         $this->assertIsInitialized();
-        if ($excludeFragment) {
-            return $this->withFragment(null)->toString() === $uri->withFragment(null)->toString();
+        if ($excludeFragment && (null !== $this->components['fragment'] || null !== $uri->components['fragment'])) {
+            return UriString::build([...$this->components, ...['fragment' => null]]) === UriString::build([...$uri->components, ...['fragment' => null]]);
         }
 
         return $this->normalizedUri === $uri->normalizedUri;
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function toRawString(): string
     {
@@ -361,7 +360,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException
+     * @throws UninitializedUriError
      */
     public function toString(): string
     {
@@ -371,7 +370,7 @@ final class Uri
     }
 
     /**
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function resolve(string $uri): self
     {
@@ -391,11 +390,11 @@ final class Uri
     /**
      * @param array{__uri:string} $data
      *
-     * @throws UninitializedUriException|InvalidUriException
+     * @throws UninitializedUriError|InvalidUriException
      */
     public function __unserialize(array $data): void
     {
-        $uri = new self($data['__uri'] ?? throw new UninitializedUriException('The `__uri` property is missing from the serialized object.'));
+        $uri = new self($data['__uri'] ?? throw new UninitializedUriError('The `__uri` property is missing from the serialized object.'));
         $this->uri = $uri->uri;
         $this->normalizedUri = $uri->normalizedUri;
         $this->components = $uri->components;
