@@ -14,11 +14,13 @@ declare(strict_types=1);
 namespace Bakame\Polyfill\Rfc3986;
 
 use Exception;
-use League\Uri\Exceptions\SyntaxError;
+use League\Uri\Encoder;
 use League\Uri\UriString;
 use SensitiveParameter;
+use SensitiveParameterValue;
 use Throwable;
 
+use function class_exists;
 use function explode;
 use function preg_match;
 use function str_contains;
@@ -34,16 +36,12 @@ final class Uri
 {
     private const TYPE_RAW = 'raw';
     private const TYPE_NORMALIZED = 'normalized';
-    private const REGEXP_VALID_SCHEME     = '/^[A-Za-z]([-A-Za-z\d+.]+)?$/';
-    private const REGEXP_INVALID_USERINFO = '/[^A-Za-z0-9\-._~!$&\'()*+,;=:%]|%(?![0-9A-Fa-f]{2})/';
-    private const REGEXP_INVALID_PATH     = '/[^A-Za-z0-9\-._~!$&\'()*+,;=:@\/%]|%(?![0-9A-Fa-f]{2})/';
-    private const REGEXP_INVALID_QUERY    = '/[^A-Za-z0-9\-._~!$&\'()*+,;=\/?%]|%(?![0-9A-Fa-f]{2})/';
-    private const REGEXP_INVALID_FRAGMENT = '/[^A-Za-z0-9\-._~!$&\'()*+,;=:@\/?%]|%(?![0-9A-Fa-f]{2})/';
-
+    /** @var Components */
+    private const DEFAULT_COMPONENTS = ['scheme' => null, 'userInfo' => null, 'user' => null, 'pass' => null, 'host' => null, 'port' => null, 'path' => null, 'query' => null, 'fragment' => null];
     /** @var Components */
     private readonly array $rawComponents;
     /** @var Components */
-    private readonly array $normalizedComponents;
+    private array $normalizedComponents = self::DEFAULT_COMPONENTS;
     private bool $isInitialized = false;
     private ?string $rawUri = null;
     private ?string $normalizedUri = null;
@@ -64,13 +62,12 @@ final class Uri
     {
         try {
             $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
-            $components = $this->uriSplit($uri);
+            $components = self::uriSplit(UriString::parse($uri));
         } catch (Exception $exception) {
             throw new InvalidUriException($exception->getMessage());
         }
 
         $this->rawComponents = self::validateComponents($components);
-        $this->normalizedComponents = $this->uriSplit(UriString::normalize($uri));
         $this->isInitialized = true;
     }
 
@@ -79,21 +76,13 @@ final class Uri
      *
      * @link https://tools.ietf.org/html/rfc3986
      *
-     * @param string $uri The URI string to parse
-     *
-     * @throws SyntaxError
+     * @param ComponentMap $parts The URI components
      *
      * @return Components
      */
-    private function uriSplit(string $uri): array
+    private static function uriSplit(array $parts): array
     {
-        /** @var Components $defaults */
-        static $defaults = [
-            'scheme' => null, 'userInfo' => null, 'user' => null, 'pass' => null, 'host' => null,
-            'port' => null, 'path' => null, 'query' => null, 'fragment' => null,
-        ];
-
-        $components = [...$defaults, ...UriString::parse($uri)];
+        $components = [...self::DEFAULT_COMPONENTS, ...$parts];
         if ('' === $components['path']) {
             $components['path'] = null;
         }
@@ -172,12 +161,29 @@ final class Uri
     private function getComponent(string $name, string $type): ?string
     {
         self::assertIsInitialized();
-        $value = (self::TYPE_RAW === $type ? $this->rawComponents : $this->normalizedComponents)[$name];
+        if (self::TYPE_RAW === $type) {
+            $value = $this->rawComponents[$name];
+            if (null !== $value) {
+                $value = (string) $value;
+            }
+
+            return $value;
+        }
+
+        $this->setNormalizedComponents();
+        $value = $this->normalizedComponents[$name];
         if (null !== $value) {
             $value = (string)$value;
         }
 
         return $value;
+    }
+
+    private function setNormalizedComponents(): void
+    {
+        if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
+            $this->normalizedComponents = self::uriSplit(UriString::parseNormalized($this->toRawString()));
+        }
     }
 
     /**
@@ -203,7 +209,7 @@ final class Uri
     {
         return match (true) {
             $encodedScheme === $this->getRawScheme() => $this,
-            null !== $encodedScheme && 1 !== preg_match(self::REGEXP_VALID_SCHEME, $encodedScheme) => throw new InvalidUriException('The scheme string component `'.$encodedScheme.'` is an invalid scheme.'),
+            null !== $encodedScheme && 1 !== preg_match('/^[A-Za-z]([-A-Za-z\d+.]+)?$/', $encodedScheme) => throw new InvalidUriException('The scheme string component `'.$encodedScheme.'` is an invalid scheme.'),
             default => new self(UriString::build([...$this->rawComponents, ...['scheme' => $encodedScheme]])),
         };
     }
@@ -233,11 +239,10 @@ final class Uri
             return $this;
         }
 
-        if (null !== $encodedUserInfo && 1 === preg_match(self::REGEXP_INVALID_USERINFO, $encodedUserInfo)) {
+        [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null]; /* @phpstan-ignore-line */
+        if (!Encoder::isUserEncoded($user) || !Encoder::isPasswordEncoded($password)) {
             throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
         }
-
-        [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null]; /* @phpstan-ignore-line */
 
         return new self(UriString::build(self::validateComponents([...$this->rawComponents, ...['user' => $user, 'password' => $password]])));
     }
@@ -347,7 +352,7 @@ final class Uri
     {
         return match (true) {
             $encodedPath === $this->getRawPath() => $this,
-            null !== $encodedPath && 1 === preg_match(self::REGEXP_INVALID_PATH, $encodedPath) => throw new InvalidUriException('The encoded path component `'.$encodedPath.'` contains invalid characters.'),
+            !Encoder::isPathEncoded($encodedPath) => throw new InvalidUriException('The encoded path component `'.$encodedPath.'` contains invalid characters.'),
             default => new self(UriString::build(self::validateComponents([...$this->rawComponents, ...['path' => $encodedPath]]))),
         };
     }
@@ -375,7 +380,7 @@ final class Uri
     {
         return match (true) {
             $encodedQuery === $this->getQuery() => $this,
-            null !== $encodedQuery && 1 === preg_match(self::REGEXP_INVALID_QUERY, $encodedQuery) => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
+            !Encoder::isQueryEncoded($encodedQuery) => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
             default => new self(UriString::build([...$this->rawComponents, ...['query' => $encodedQuery]])),
         };
     }
@@ -403,7 +408,7 @@ final class Uri
     {
         return match (true) {
             $encodedFragment === $this->getFragment() => $this,
-            null !== $encodedFragment && 1 === preg_match(self::REGEXP_INVALID_FRAGMENT, $encodedFragment) => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
+            !Encoder::isFragmentEncoded($encodedFragment) => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
             default => new self(UriString::build([...$this->rawComponents, ...['fragment' => $encodedFragment]])),
         };
     }
@@ -414,6 +419,7 @@ final class Uri
     public function equals(self $uri, bool $excludeFragment = true): bool
     {
         $this->assertIsInitialized();
+        $this->setNormalizedComponents();
 
         if ($excludeFragment && ($this->normalizedComponents['fragment'] !== $uri->normalizedComponents['fragment'])) {
             return UriString::build([...$this->normalizedComponents, ...['fragment' => null]]) === UriString::build([...$uri->normalizedComponents, ...['fragment' => null]]);
@@ -440,6 +446,7 @@ final class Uri
     public function toString(): string
     {
         $this->assertIsInitialized();
+        $this->setNormalizedComponents();
 
         $this->normalizedUri ??= UriString::build($this->normalizedComponents);
 
@@ -472,9 +479,12 @@ final class Uri
     public function __unserialize(array $data): void
     {
         $uri = new self($data['__uri'] ?? throw new UninitializedUriError('The `__uri` property is missing from the serialized object.'));
+
         $this->rawComponents = $uri->rawComponents;
-        $this->normalizedComponents = $uri->normalizedComponents;
-        $this->isInitialized = $uri->isInitialized;
+        $this->normalizedComponents = self::DEFAULT_COMPONENTS;
+        $this->rawUri = null;
+        $this->normalizedUri = null;
+        $this->isInitialized = true;
     }
 
     /**
@@ -487,9 +497,12 @@ final class Uri
         $components = $this->rawComponents;
         unset($components['userInfo']);
 
-        //the pass component is retracted, in debug mode, for security reason
-        //whether it is present or not to avoid leaking its real presence
-        $components['pass'] = '*****';
+        // the pass component is retracted from the output
+        // whenever the user component is set for security
+        // reason to avoid leaking its value
+        if (isset($components['user'])) {
+            $components['pass'] = class_exists(SensitiveParameterValue::class) ? new SensitiveParameterValue($components['pass']) : '****';
+        }
 
         return $components;
     }
