@@ -17,7 +17,7 @@ use Exception;
 use League\Uri\Encoder;
 use League\Uri\UriString;
 use SensitiveParameter;
-use Throwable;
+use ValueError;
 
 use function explode;
 use function preg_match;
@@ -48,7 +48,7 @@ final class Uri
     {
         try {
             return new self($uri, $baseUri);
-        } catch (Throwable) {
+        } catch (Exception) {
             return null;
         }
     }
@@ -58,6 +58,10 @@ final class Uri
      */
     public function __construct(string $uri, ?string $baseUri = null)
     {
+        if ('' === $uri && null === $baseUri) {
+            throw new ValueError('Argument #1 ($uri) cannot be empty.');
+        }
+
         try {
             $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
             $components = self::uriSplit(UriString::parse($uri));
@@ -148,7 +152,7 @@ final class Uri
      */
     private function assertIsInitialized(): void
     {
-        $this->isInitialized || throw new UninitializedUriError('Object of type '.self::class.' has not been correctly initialized.');
+        $this->isInitialized || throw new UninitializedUriError(self::class.' object is not correctly initialized.');
     }
 
     /**
@@ -301,6 +305,8 @@ final class Uri
         if ($encodedHost === $this->getRawHost()) {
             return $this;
         }
+
+        UriString::isHost($encodedHost) || throw new InvalidUriException('The host component value `'.$encodedHost.'` is not a valid host.');
 
         return new self(UriString::build(self::validateComponents([...$this->rawComponents, ...['host' => $encodedHost]])));
     }

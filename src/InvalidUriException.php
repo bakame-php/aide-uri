@@ -13,6 +13,20 @@ declare(strict_types=1);
 
 namespace Bakame\Polyfill\Rfc3986;
 
+use Exception;
+
 class InvalidUriException extends UriException
 {
+    /** @var array<int, string> $errors */
+    public readonly array $errors;
+
+    /**
+     * @param array<int, string> $errors
+     */
+    public function __construct(string $message, int $code = 0, ?Exception $previous = null, array $errors = [])
+    {
+        parent::__construct('URI parsing failed; '.$message, $code, $previous);
+
+        $this->errors = $errors;
+    }
 }
