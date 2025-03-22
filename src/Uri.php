@@ -18,7 +18,6 @@ use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\UriString;
 use SensitiveParameter;
-use ValueError;
 
 use function explode;
 use function preg_match;
@@ -77,10 +76,6 @@ final class Uri
      */
     public function __construct(string $uri, ?string $baseUri = null)
     {
-        if ('' === $uri && null === $baseUri) {
-            throw new ValueError('Argument #1 ($uri) cannot be empty.');
-        }
-
         try {
             $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
             $this->rawComponents = self::uriSplit(UriString::parse($uri));
@@ -103,10 +98,6 @@ final class Uri
     private static function uriSplit(array $parts): array
     {
         $components = [...self::DEFAULT_COMPONENTS, ...$parts];
-        if ('' === $components['path']) {
-            $components['path'] = null;
-        }
-
         if (null === $components['user']) {
             return $components;
         }
@@ -281,13 +272,11 @@ final class Uri
      */
     public function withHost(?string $encodedHost): self
     {
-        if ($encodedHost === $this->getRawHost()) {
-            return $this;
-        }
-
-        UriString::isHost($encodedHost) || throw new InvalidUriException('The host component value `'.$encodedHost.'` is not a valid host.');
-
-        return self::fromComponents([...$this->rawComponents, ...['host' => $encodedHost]]);
+        return match (true) {
+            $encodedHost === $this->getRawHost() => $this,
+            UriString::isHost($encodedHost) => self::fromComponents([...$this->rawComponents, ...['host' => $encodedHost]]),
+            default => throw new InvalidUriException('The host component value `'.$encodedHost.'` is not a valid host.'),
+        };
     }
 
     /**
@@ -335,8 +324,8 @@ final class Uri
     {
         return match (true) {
             $encodedPath === $this->getRawPath() => $this,
-            !Encoder::isPathEncoded($encodedPath) => throw new InvalidUriException('The encoded path component `'.$encodedPath.'` contains invalid characters.'),
-            default => self::fromComponents([...$this->rawComponents, ...['path' => $encodedPath]]),
+            Encoder::isPathEncoded($encodedPath) => self::fromComponents([...$this->rawComponents, ...['path' => $encodedPath]]),
+            default => throw new InvalidUriException('The encoded path component `'.$encodedPath.'` contains invalid characters.'),
         };
     }
 
@@ -363,8 +352,8 @@ final class Uri
     {
         return match (true) {
             $encodedQuery === $this->getQuery() => $this,
-            !Encoder::isQueryEncoded($encodedQuery) => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
-            default => self::fromComponents([...$this->rawComponents, ...['query' => $encodedQuery]]),
+            Encoder::isQueryEncoded($encodedQuery) => self::fromComponents([...$this->rawComponents, ...['query' => $encodedQuery]]),
+            default => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
         };
     }
 
@@ -391,8 +380,8 @@ final class Uri
     {
         return match (true) {
             $encodedFragment === $this->getFragment() => $this,
-            !Encoder::isFragmentEncoded($encodedFragment) => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
-            default => self::fromComponents([...$this->rawComponents, ...['fragment' => $encodedFragment]]),
+            Encoder::isFragmentEncoded($encodedFragment) => self::fromComponents([...$this->rawComponents, ...['fragment' => $encodedFragment]]),
+            default => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
         };
     }
 
