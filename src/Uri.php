@@ -15,18 +15,20 @@ namespace Bakame\Polyfill\Rfc3986;
 
 use Exception;
 use League\Uri\Encoder;
+use League\Uri\Exceptions\SyntaxError;
 use League\Uri\UriString;
 use SensitiveParameter;
 use ValueError;
 
 use function explode;
 use function preg_match;
-use function str_contains;
-use function str_starts_with;
-use function strpos;
-use function substr;
 
 /**
+ * This is a user-land polyfill to the native Uri\Rfc3986\Uri class proposed
+ * in the PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support.
+ *
+ * @see https://wiki.php.net/rfc/url_parsing_api
+ *
  * @phpstan-type ComponentMap array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
  * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
  */
@@ -54,6 +56,23 @@ final class Uri
     }
 
     /**
+     * @param Components $components
+     *
+     * @throws InvalidUriException
+     *
+     */
+    private static function fromComponents(array $components): self
+    {
+        try {
+            $uri = UriString::build($components);
+        } catch (SyntaxError $exception) {
+            throw new InvalidUriException($exception->getMessage(), previous: $exception);
+        }
+
+        return new self($uri);
+    }
+
+    /**
      * @throws InvalidUriException
      */
     public function __construct(string $uri, ?string $baseUri = null)
@@ -64,12 +83,11 @@ final class Uri
 
         try {
             $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
-            $components = self::uriSplit(UriString::parse($uri));
+            $this->rawComponents = self::uriSplit(UriString::parse($uri));
         } catch (Exception $exception) {
             throw new InvalidUriException($exception->getMessage());
         }
 
-        $this->rawComponents = self::validateComponents($components);
         $this->isInitialized = true;
     }
 
@@ -99,50 +117,6 @@ final class Uri
         }
 
         $components['userInfo'] .= ':'.$components['pass'];
-
-        return $components;
-    }
-
-    /**
-     * Assert the URI internal state is valid.
-     *
-     * @link https://tools.ietf.org/html/rfc3986#section-3
-     * @link https://tools.ietf.org/html/rfc3986#section-3.3
-     *
-     * @param Components $components
-     *
-     * @throws InvalidUriException
-     *
-     * @return Components
-     */
-    private static function validateComponents(array $components): array
-    {
-        $authority = UriString::buildAuthority($components);
-        $path = $components['path'];
-
-        if (null !== $authority) {
-            if (null !== $path && '' !== $path && '/' !== $path[0]) {
-                throw new InvalidUriException('If an authority is present the path must be empty or start with a `/`.');
-            }
-
-            return $components;
-        }
-
-        if (null === $path || '' === $path) {
-            return $components;
-        }
-
-        if (str_starts_with($path, '//')) {
-            throw new InvalidUriException('If there is no authority the path `'.$path.'` cannot start with a `//`.');
-        }
-
-        if (null !== $components['scheme'] || false === ($pos = strpos($path, ':'))) {
-            return $components;
-        }
-
-        if (!str_contains(substr($path, 0, $pos), '/')) {
-            throw new InvalidUriException('In absence of a scheme and an authority the first path segment cannot contain a colon (":") character.');
-        }
 
         return $components;
     }
@@ -212,7 +186,7 @@ final class Uri
         return match (true) {
             $encodedScheme === $this->getRawScheme() => $this,
             null !== $encodedScheme && 1 !== preg_match('/^[A-Za-z]([-A-Za-z\d+.]+)?$/', $encodedScheme) => throw new InvalidUriException('The scheme string component `'.$encodedScheme.'` is an invalid scheme.'),
-            default => new self(UriString::build([...$this->rawComponents, ...['scheme' => $encodedScheme]])),
+            default => self::fromComponents([...$this->rawComponents, ...['scheme' => $encodedScheme]]),
         };
     }
 
@@ -241,12 +215,17 @@ final class Uri
             return $this;
         }
 
-        [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null]; /* @phpstan-ignore-line */
-        if (!Encoder::isUserEncoded($user) || !Encoder::isPasswordEncoded($password)) {
-            throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
+        if (null === $encodedUserInfo) {
+            return self::fromComponents([...$this->rawComponents, ...['user' => null, 'password' => null]]);
         }
 
-        return new self(UriString::build(self::validateComponents([...$this->rawComponents, ...['user' => $user, 'password' => $password]])));
+        [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null];
+
+        return match (false) {
+            Encoder::isUserEncoded($user),
+            Encoder::isPasswordEncoded($password) => throw new InvalidUriException('The encoded userInfo string component contains invalid characters.'),
+            default => self::fromComponents([...$this->rawComponents, ...['user' => $user, 'password' => $password]]),
+        };
     }
 
     /**
@@ -308,7 +287,7 @@ final class Uri
 
         UriString::isHost($encodedHost) || throw new InvalidUriException('The host component value `'.$encodedHost.'` is not a valid host.');
 
-        return new self(UriString::build(self::validateComponents([...$this->rawComponents, ...['host' => $encodedHost]])));
+        return self::fromComponents([...$this->rawComponents, ...['host' => $encodedHost]]);
     }
 
     /**
@@ -329,7 +308,7 @@ final class Uri
         return match (true) {
             $port === $this->getPort() => $this,
             null !== $port && ($port < 0 || $port > 65535) => throw new InvalidUriException('The port component value must be null or an integer between 0 and 65535.'),
-            default => new self(UriString::build([...$this->rawComponents, ...['port' => $port]])),
+            default => self::fromComponents([...$this->rawComponents, ...['port' => $port]]),
         };
     }
 
@@ -357,7 +336,7 @@ final class Uri
         return match (true) {
             $encodedPath === $this->getRawPath() => $this,
             !Encoder::isPathEncoded($encodedPath) => throw new InvalidUriException('The encoded path component `'.$encodedPath.'` contains invalid characters.'),
-            default => new self(UriString::build(self::validateComponents([...$this->rawComponents, ...['path' => $encodedPath]]))),
+            default => self::fromComponents([...$this->rawComponents, ...['path' => $encodedPath]]),
         };
     }
 
@@ -385,7 +364,7 @@ final class Uri
         return match (true) {
             $encodedQuery === $this->getQuery() => $this,
             !Encoder::isQueryEncoded($encodedQuery) => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
-            default => new self(UriString::build([...$this->rawComponents, ...['query' => $encodedQuery]])),
+            default => self::fromComponents([...$this->rawComponents, ...['query' => $encodedQuery]]),
         };
     }
 
@@ -413,7 +392,7 @@ final class Uri
         return match (true) {
             $encodedFragment === $this->getFragment() => $this,
             !Encoder::isFragmentEncoded($encodedFragment) => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
-            default => new self(UriString::build([...$this->rawComponents, ...['fragment' => $encodedFragment]])),
+            default => self::fromComponents([...$this->rawComponents, ...['fragment' => $encodedFragment]]),
         };
     }
 
