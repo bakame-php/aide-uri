@@ -29,5 +29,10 @@
     <include>
       <directory suffix=".php">src</directory>
     </include>
+    <exclude>
+      <directory suffix="Bench.php">src</directory>
+      <directory suffix="Test.php">src</directory>
+      <directory suffix="TestCase.php">src</directory>
+    </exclude>
   </source>
 </phpunit>
