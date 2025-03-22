@@ -78,7 +78,7 @@ final class Uri
     {
         try {
             $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
-            $this->rawComponents = self::uriSplit(UriString::parse($uri));
+            $this->rawComponents = self::setUserInfo(UriString::parse($uri));
         } catch (Exception $exception) {
             throw new InvalidUriException($exception->getMessage());
         }
@@ -95,10 +95,13 @@ final class Uri
      *
      * @return Components
      */
-    private static function uriSplit(array $parts): array
+    private static function setUserInfo(array $parts): array
     {
         $components = [...self::DEFAULT_COMPONENTS, ...$parts];
         if (null === $components['user']) {
+            $components['pass'] = null;
+            $components['userInfo'] = null;
+
             return $components;
         }
 
@@ -149,7 +152,7 @@ final class Uri
     private function setNormalizedComponents(): void
     {
         if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
-            $this->normalizedComponents = self::uriSplit(UriString::parseNormalized($this->toRawString()));
+            $this->normalizedComponents = self::setUserInfo(UriString::parseNormalized($this->toRawString()));
         }
     }
 
