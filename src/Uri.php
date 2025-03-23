@@ -20,7 +20,6 @@ use League\Uri\UriString;
 use SensitiveParameter;
 
 use function explode;
-use function preg_match;
 
 /**
  * This is a user-land polyfill to the native Uri\Rfc3986\Uri class proposed
@@ -179,7 +178,7 @@ final class Uri
     {
         return match (true) {
             $encodedScheme === $this->getRawScheme() => $this,
-            null === $encodedScheme || 1 === preg_match('/^[A-Za-z]([-A-Za-z\d+.]+)?$/', $encodedScheme) => $this->withComponent(['scheme' => $encodedScheme]),
+            UriString::isScheme($encodedScheme) => $this->withComponent(['scheme' => $encodedScheme]),
             default => throw new InvalidUriException('The scheme string component `'.$encodedScheme.'` is an invalid scheme.'),
         };
     }
