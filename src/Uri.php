@@ -62,7 +62,7 @@ final class Uri
         try {
             $components = UriString::parse(null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri);
         } catch (Exception $exception) {
-            throw new InvalidUriException($exception->getMessage());
+            throw new InvalidUriException($exception->getMessage(), previous: $exception);
         }
 
         $this->rawComponents = self::addUserInfo($components);
@@ -133,6 +133,22 @@ final class Uri
         return $value;
     }
 
+    /**
+     * @param InputComponentMap $components
+     *
+     * @throws InvalidUriException
+     */
+    private function withComponent(array $components): self
+    {
+        try {
+            $uri = UriString::build([...$this->rawComponents, ...$components]);
+        } catch (SyntaxError $exception) {
+            throw new InvalidUriException($exception->getMessage(), previous: $exception);
+        }
+
+        return new self($uri);
+    }
+
     private function setNormalizedComponents(): void
     {
         if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
@@ -154,22 +170,6 @@ final class Uri
     public function getRawScheme(): ?string
     {
         return $this->getComponent('scheme', self::TYPE_RAW);
-    }
-
-    /**
-     * @param InputComponentMap $components
-     *
-     * @throws InvalidUriException
-     */
-    private function withComponent(array $components): self
-    {
-        try {
-            $uri = UriString::build([...$this->rawComponents, ...$components]);
-        } catch (SyntaxError $exception) {
-            throw new InvalidUriException($exception->getMessage(), previous: $exception);
-        }
-
-        return new self($uri);
     }
 
     /**
