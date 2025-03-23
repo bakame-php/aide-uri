@@ -39,11 +39,11 @@ final class Uri
     private const DEFAULT_COMPONENTS = ['scheme' => null, 'userInfo' => null, 'user' => null, 'pass' => null, 'host' => null, 'port' => null, 'path' => null, 'query' => null, 'fragment' => null];
     /** @var Components */
     private readonly array $rawComponents;
+    private readonly string $rawUri;
     /** @var Components */
     private array $normalizedComponents = self::DEFAULT_COMPONENTS;
-    private bool $isInitialized = false;
-    private ?string $rawUri = null;
     private ?string $normalizedUri = null;
+    private bool $isInitialized = false;
 
     public static function parse(string $uri, ?string $baseUri = null): ?Uri
     {
@@ -66,6 +66,7 @@ final class Uri
         }
 
         $this->rawComponents = self::addUserInfo($components);
+        $this->rawUri = $uri;
         $this->isInitialized = true;
     }
 
@@ -117,7 +118,7 @@ final class Uri
         if (self::TYPE_RAW === $type) {
             $value = $this->rawComponents[$name];
             if (null !== $value) {
-                $value = (string) $value;
+                return (string) $value;
             }
 
             return $value;
@@ -126,7 +127,7 @@ final class Uri
         $this->setNormalizedComponents();
         $value = $this->normalizedComponents[$name];
         if (null !== $value) {
-            $value = (string) $value;
+            return (string) $value;
         }
 
         return $value;
@@ -353,7 +354,7 @@ final class Uri
     public function withQuery(?string $encodedQuery): self
     {
         return match (true) {
-            $encodedQuery === $this->getQuery() => $this,
+            $encodedQuery === $this->getRawQuery() => $this,
             Encoder::isQueryEncoded($encodedQuery) => $this->withComponent(['query' => $encodedQuery]),
             default => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
         };
@@ -381,7 +382,7 @@ final class Uri
     public function withFragment(?string $encodedFragment): self
     {
         return match (true) {
-            $encodedFragment === $this->getFragment() => $this,
+            $encodedFragment === $this->getRawFragment() => $this,
             Encoder::isFragmentEncoded($encodedFragment) => $this->withComponent(['fragment' => $encodedFragment]),
             default => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
         };
@@ -405,7 +406,6 @@ final class Uri
     public function toRawString(): string
     {
         $this->assertIsInitialized();
-        $this->rawUri ??= UriString::build($this->rawComponents);
 
         return $this->rawUri;
     }
@@ -435,8 +435,6 @@ final class Uri
      */
     public function __serialize(): array
     {
-        $this->assertIsInitialized();
-
         return ['__uri' => $this->toRawString()];
     }
 
@@ -450,8 +448,8 @@ final class Uri
         $uri = new self($data['__uri'] ?? throw new UninitializedUriError('The `__uri` property is missing from the serialized object.'));
 
         $this->rawComponents = $uri->rawComponents;
+        $this->rawUri = $uri->rawUri;
         $this->normalizedComponents = self::DEFAULT_COMPONENTS;
-        $this->rawUri = null;
         $this->normalizedUri = null;
         $this->isInitialized = true;
     }
