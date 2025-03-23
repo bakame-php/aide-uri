@@ -61,12 +61,12 @@ final class Uri
     public function __construct(string $uri, ?string $baseUri = null)
     {
         try {
-            $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
-            $this->rawComponents = self::addUserInfo(UriString::parse($uri));
+            $components = UriString::parse(null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri);
         } catch (Exception $exception) {
             throw new InvalidUriException($exception->getMessage());
         }
 
+        $this->rawComponents = self::addUserInfo($components);
         $this->isInitialized = true;
     }
 
@@ -114,7 +114,7 @@ final class Uri
      */
     private function getComponent(string $name, string $type): ?string
     {
-        self::assertIsInitialized();
+        $this->assertIsInitialized();
         if (self::TYPE_RAW === $type) {
             $value = $this->rawComponents[$name];
             if (null !== $value) {
@@ -127,7 +127,7 @@ final class Uri
         $this->setNormalizedComponents();
         $value = $this->normalizedComponents[$name];
         if (null !== $value) {
-            $value = (string)$value;
+            $value = (string) $value;
         }
 
         return $value;
@@ -287,7 +287,7 @@ final class Uri
      */
     public function getPort(): ?int
     {
-        self::assertIsInitialized();
+        $this->assertIsInitialized();
 
         return $this->rawComponents['port'];
     }
