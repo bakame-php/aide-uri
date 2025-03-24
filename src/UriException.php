@@ -11,10 +11,14 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Polyfill\Rfc3986;
+namespace Uri\Rfc3986;
 
 use Exception;
 
-class UriException extends Exception
-{
+use const PHP_VERSION_ID;
+
+if (PHP_VERSION_ID < 80500) {
+    class UriException extends Exception
+    {
+    }
 }

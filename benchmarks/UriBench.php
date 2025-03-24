@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Polyfill\Rfc3986;
+namespace Uri\Rfc3986;
 
 use PhpBench\Attributes as Bench;
-
 use function parse_url;
 
 final class UriBench

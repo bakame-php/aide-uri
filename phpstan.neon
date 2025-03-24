@@ -5,6 +5,7 @@ includes:
     - vendor/phpstan/phpstan-phpunit/rules.neon
 parameters:
     ignoreErrors:
+        - '#Comparison operation "<" between int<80100, 80499> and 80500 is always true.#'
     level: max
     paths:
         - src

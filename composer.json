@@ -12,15 +12,16 @@
     ],
     "autoload": {
         "psr-4": {
-            "Bakame\\Polyfill\\Rfc3986\\": "src"
+            "Uri\\Rfc3986\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Bakame\\Polyfill\\Rfc3986\\": "tests/"
+            "Uri\\Rfc3986\\": ["tests/", "benchmarks/"]
         }
     },
     "require": {
+        "php": "^8.1",
         "league/uri-interfaces": "dev-master"
     },
     "require-dev": {

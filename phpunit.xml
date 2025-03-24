@@ -19,7 +19,7 @@
   </coverage>
   <testsuites>
     <testsuite name="Aide URI polyfill">
-      <directory suffix="Test.php">src</directory>
+      <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
   <logging>
@@ -29,10 +29,5 @@
     <include>
       <directory suffix=".php">src</directory>
     </include>
-    <exclude>
-      <directory suffix="Bench.php">src</directory>
-      <directory suffix="Test.php">src</directory>
-      <directory suffix="TestCase.php">src</directory>
-    </exclude>
   </source>
 </phpunit>
