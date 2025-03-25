@@ -12,12 +12,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Uri\\Rfc3986\\": "src"
+            "Uri\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Uri\\Rfc3986\\": ["tests/", "benchmarks/"]
+            "Uri\\": ["tests/", "benchmarks/"]
         }
     },
     "require": {

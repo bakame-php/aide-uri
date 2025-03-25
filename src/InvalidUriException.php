@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Uri\Rfc3986;
+namespace Uri;
 
 use Exception;
 

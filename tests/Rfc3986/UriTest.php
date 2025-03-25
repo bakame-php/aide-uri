@@ -17,7 +17,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use ValueError;
+use Uri\InvalidUriException;
+use Uri\UninitializedUriError;
 
 #[CoversClass(Uri::class)]
 final class UriTest extends TestCase

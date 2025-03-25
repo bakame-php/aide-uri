@@ -18,6 +18,8 @@ use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\UriString;
 use SensitiveParameter;
+use Uri\InvalidUriException;
+use Uri\UninitializedUriError;
 
 use function explode;
 use function preg_match;
@@ -26,7 +28,7 @@ use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80500) {
     /**
-     * This is a user-land polyfill to the native Uri\Rfc3986\Uri class proposed
+     * This is a user-land polyfill to the native Uri\Rfc3986\Rfc3986\Uri class proposed
      * in the PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
