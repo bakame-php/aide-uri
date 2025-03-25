@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ValueError;
 
 #[CoversClass(Uri::class)]
 final class UriTest extends TestCase
@@ -225,5 +226,22 @@ final class UriTest extends TestCase
             'query' => 'abc=abc',
             'fragment' => 'abc',
         ], $uriBis->__debugInfo());
+    }
+
+    #[Test]
+    public function it_will_use_the_punycode_form_on_host_normalization(): void
+    {
+        $uri = new Uri("https://www.b%C3%A9b%C3%A9.be#foobar");
+
+        self::assertSame('www.b%C3%A9b%C3%A9.be', $uri->getRawHost());
+        self::assertSame('www.xn--bb-bjab.be', $uri->getHost());
+    }
+
+    #[Test]
+    public function it_fails_to_parse_uri_with_invalid_characters(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        new Uri("https://www.bébé.be#foobar");
     }
 }

@@ -20,6 +20,7 @@ use League\Uri\UriString;
 use SensitiveParameter;
 
 use function explode;
+use function preg_match;
 
 use const PHP_VERSION_ID;
 
@@ -36,6 +37,7 @@ if (PHP_VERSION_ID < 80500) {
      */
     final class Uri
     {
+        private const REGEXP_ALLOWED_CHARACTERS = '/^(?:[A-Za-z0-9\-._~:\/?#[\]@!$&\'()*+,;=%]|%[0-9A-Fa-f]{2})*$/';
         private const TYPE_RAW = 'raw';
         private const TYPE_NORMALIZED = 'normalized';
         /** @var Components */
@@ -64,6 +66,10 @@ if (PHP_VERSION_ID < 80500) {
         {
             try {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
+                if (1 !== preg_match(static::REGEXP_ALLOWED_CHARACTERS, $uri)) {
+                    throw new Exception('The parsed URI `'.$uri.'` contains invalid RFC3986 characters.');
+                }
+
                 $components = UriString::parse($uri);
             } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
@@ -397,10 +403,10 @@ if (PHP_VERSION_ID < 80500) {
         public function equals(self $uri, bool $excludeFragment = true): bool
         {
             if ($excludeFragment && ($this->getFragment() !== $uri->getFragment())) {
-                return UriString::build([...$this->normalizedComponents, ...['fragment' => null]]) === UriString::build([...$uri->normalizedComponents, ...['fragment' => null]]);
+                return [...$this->normalizedComponents, ...['fragment' => null]] === [...$uri->normalizedComponents, ...['fragment' => null]];
             }
 
-            return $this->toString() === $uri->toString();
+            return $this->normalizedComponents === $uri->normalizedComponents;
         }
 
         /**
