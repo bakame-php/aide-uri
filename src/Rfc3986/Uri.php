@@ -130,7 +130,6 @@ if (PHP_VERSION_ID < 80500) {
         {
             if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
                 $this->normalizedComponents = self::addUserInfo(UriString::parseNormalized($this->toRawString()));
-                $this->normalizedUri = UriString::build($this->normalizedComponents);
             }
         }
 
@@ -436,6 +435,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             $this->assertIsInitialized();
             $this->setNormalizedComponents();
+            $this->normalizedUri ??= UriString::build($this->normalizedComponents);
 
             return $this->normalizedUri;
         }
