@@ -15,7 +15,6 @@ namespace Uri\Rfc3986;
 
 use Exception;
 use League\Uri\Encoder;
-use League\Uri\Exceptions\SyntaxError;
 use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
@@ -71,6 +70,9 @@ if (PHP_VERSION_ID < 80500) {
             $this->isInitialized = true;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         private static function assertUriContainsValidRfc3986Characters(?string $uri): void
         {
             null === $uri
@@ -128,6 +130,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
                 $this->normalizedComponents = self::addUserInfo(UriString::parseNormalized($this->toRawString()));
+                $this->normalizedUri = UriString::build($this->normalizedComponents);
             }
         }
 
@@ -141,20 +144,20 @@ if (PHP_VERSION_ID < 80500) {
             $this->assertIsInitialized();
             if (self::TYPE_RAW === $type) {
                 $value = $this->rawComponents[$name];
-                if (null !== $value) {
-                    return (string)$value;
+                if (null === $value) {
+                    return null;
                 }
 
-                return null;
+                return (string) $value;
             }
 
             $this->setNormalizedComponents();
             $value = $this->normalizedComponents[$name];
-            if (null !== $value) {
-                return (string)$value;
+            if (null === $value) {
+                return null;
             }
 
-            return null;
+            return (string) $value;
         }
 
         /**
@@ -166,7 +169,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             try {
                 $uri = UriString::build([...$this->rawComponents, ...$components]);
-            } catch (SyntaxError $exception) {
+            } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
             }
 
@@ -433,7 +436,6 @@ if (PHP_VERSION_ID < 80500) {
         {
             $this->assertIsInitialized();
             $this->setNormalizedComponents();
-            $this->normalizedUri ??= UriString::build($this->normalizedComponents);
 
             return $this->normalizedUri;
         }
