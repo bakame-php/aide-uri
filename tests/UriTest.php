@@ -244,4 +244,44 @@ final class UriTest extends TestCase
 
         new Uri("https://www.bébé.be#foobar");
     }
+
+    #[Test]
+    public function it_fails_to_update_the_uri_if_the_component_is_invalid(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new Uri(""))->withPath(':/')->toString();
+    }
+
+    #[Test]
+    public function it_can_update_the_uri_scheme(): void
+    {
+        $uri = new Uri("https://www.b%C3%A9b%C3%A9.be#foobar");
+        $newUri = $uri->withScheme('FoO');
+
+        self::assertSame('FoO', $newUri->getRawScheme());
+        self::assertSame('foo', $newUri->getScheme());
+    }
+
+    #[Test]
+    public function it_can_update_the_user_info_component(): void
+    {
+        $uri1 = new Uri('http://example.com#foobar');
+        $uriWithUser = $uri1->withUserInfo('apple');
+
+        self::assertSame('apple', $uriWithUser->getUserInfo());
+        self::assertSame('apple', $uriWithUser->getUser());
+        self::assertNull($uriWithUser->getPassword());
+        self::assertNull($uriWithUser->getRawPassword());
+
+        $uriWithUserAndPassword = $uriWithUser->withUserInfo('banana:cream');
+        self::assertSame('banana:cream', $uriWithUserAndPassword->getUserInfo());
+        self::assertSame('banana', $uriWithUserAndPassword->getUser());
+        self::assertSame('cream', $uriWithUserAndPassword->getRawPassword());
+        self::assertSame('cream', $uriWithUserAndPassword->getPassword());
+
+        $uriStripped = $uriWithUserAndPassword->withUserInfo(null);
+        self::assertTrue($uriStripped->equals($uri1));
+        self::assertTrue($uriStripped->withUserInfo(null)->equals($uriStripped));
+    }
 }

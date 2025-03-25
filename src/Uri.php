@@ -31,13 +31,12 @@ if (PHP_VERSION_ID < 80500) {
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      *
-     * @phpstan-type ComponentMap array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
      * @phpstan-type InputComponentMap array{scheme?: ?string, user?: ?string, pass?: ?string, host?: ?string, port?: ?int, path?: ?string, query?: ?string, fragment?: ?string}
+     * @phpstan-type ComponentMap array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
      * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
      */
     final class Uri
     {
-        private const REGEXP_ALLOWED_CHARACTERS = '/^(?:[A-Za-z0-9\-._~:\/?#[\]@!$&\'()*+,;=%]|%[0-9A-Fa-f]{2})*$/';
         private const TYPE_RAW = 'raw';
         private const TYPE_NORMALIZED = 'normalized';
         /** @var Components */
@@ -50,26 +49,16 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $normalizedUri = null;
         private bool $isInitialized = false;
 
-        public static function parse(string $uri, ?string $baseUri = null): ?Uri
-        {
-            try {
-                return new self($uri, $baseUri);
-            } catch (Exception) {
-                return null;
-            }
-        }
-
         /**
          * @throws InvalidUriException
          */
         public function __construct(string $uri, ?string $baseUri = null)
         {
+            self::assertUriContainsValidRfc3986Characters($uri);
+            self::assertUriContainsValidRfc3986Characters($baseUri);
+
             try {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
-                if (1 !== preg_match(static::REGEXP_ALLOWED_CHARACTERS, $uri)) {
-                    throw new Exception('The parsed URI `'.$uri.'` contains invalid RFC3986 characters.');
-                }
-
                 $components = UriString::parse($uri);
             } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
@@ -78,6 +67,13 @@ if (PHP_VERSION_ID < 80500) {
             $this->rawComponents = self::addUserInfo($components);
             $this->rawUri = $uri;
             $this->isInitialized = true;
+        }
+
+        private static function assertUriContainsValidRfc3986Characters(?string $uri): void
+        {
+            null === $uri
+            || 1 === preg_match('/^(?:[A-Za-z0-9\-._~:\/?#[\]@!$&\'()*+,;=%]|%[0-9A-Fa-f]{2})*$/', $uri)
+            || throw new InvalidUriException('The URI `'.$uri.'` contains invalid RFC3986 characters.');
         }
 
         /**
@@ -109,6 +105,15 @@ if (PHP_VERSION_ID < 80500) {
             return $components;
         }
 
+        public static function parse(string $uri, ?string $baseUri = null): ?Uri
+        {
+            try {
+                return new self($uri, $baseUri);
+            } catch (Exception) {
+                return null;
+            }
+        }
+
         /**
          * @throws UninitializedUriError
          */
@@ -138,7 +143,7 @@ if (PHP_VERSION_ID < 80500) {
                     return (string)$value;
                 }
 
-                return $value;
+                return null;
             }
 
             $this->setNormalizedComponents();
@@ -147,7 +152,7 @@ if (PHP_VERSION_ID < 80500) {
                 return (string)$value;
             }
 
-            return $value;
+            return null;
         }
 
         /**
@@ -464,16 +469,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{
-         *     scheme: ?string,
-         *     user: ?string,
-         *     password: ?string,
-         *     host: ?string,
-         *     port: ?int,
-         *     path: ?string,
-         *     query: ?string,
-         *     fragment: ?string
-         * }
+         * @return array{scheme: ?string, user: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
          */
         public function __debugInfo(): array
         {
