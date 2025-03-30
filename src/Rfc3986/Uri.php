@@ -18,7 +18,6 @@ use League\Uri\Encoder;
 use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
-use Uri\UninitializedUriError;
 
 use function explode;
 use function preg_match;
@@ -48,7 +47,6 @@ if (PHP_VERSION_ID < 80500) {
         /** @var Components */
         private array $normalizedComponents = self::DEFAULT_COMPONENTS;
         private ?string $normalizedUri = null;
-        private bool $isInitialized = false;
 
         /**
          * @throws InvalidUriException
@@ -67,7 +65,6 @@ if (PHP_VERSION_ID < 80500) {
 
             $this->rawComponents = self::addUserInfo($components);
             $this->rawUri = $uri;
-            $this->isInitialized = true;
         }
 
         /**
@@ -118,14 +115,6 @@ if (PHP_VERSION_ID < 80500) {
             }
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
-        private function assertIsInitialized(): void
-        {
-            $this->isInitialized || throw new UninitializedUriError(self::class.' object is not correctly initialized.');
-        }
-
         private function setNormalizedComponents(): void
         {
             if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
@@ -135,12 +124,9 @@ if (PHP_VERSION_ID < 80500) {
 
         /**
          * @param self::TYPE_RAW|self::TYPE_NORMALIZED $type
-         *
-         * @throws UninitializedUriError
          */
         private function getComponent(string $name, string $type): ?string
         {
-            $this->assertIsInitialized();
             if (self::TYPE_RAW === $type) {
                 $value = $this->rawComponents[$name];
                 if (null === $value) {
@@ -175,24 +161,18 @@ if (PHP_VERSION_ID < 80500) {
             return new self($uri);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getScheme(): ?string
         {
             return $this->getComponent('scheme', self::TYPE_NORMALIZED);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawScheme(): ?string
         {
             return $this->getComponent('scheme', self::TYPE_RAW);
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withScheme(?string $encodedScheme): self
         {
@@ -203,24 +183,18 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getUserInfo(): ?string
         {
             return $this->getComponent('userInfo', self::TYPE_NORMALIZED);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawUserInfo(): ?string
         {
             return $this->getComponent('userInfo', self::TYPE_RAW);
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withUserInfo(#[SensitiveParameter] ?string $encodedUserInfo): self
         {
@@ -240,56 +214,38 @@ if (PHP_VERSION_ID < 80500) {
             return $this->withComponent(['user' => $user, 'pass' => $password]);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawUser(): ?string
         {
             return $this->getComponent('user', self::TYPE_RAW);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getUser(): ?string
         {
             return $this->getComponent('user', self::TYPE_NORMALIZED);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawPassword(): ?string
         {
             return $this->getComponent('pass', self::TYPE_RAW);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getPassword(): ?string
         {
             return $this->getComponent('pass', self::TYPE_NORMALIZED);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawHost(): ?string
         {
             return $this->getComponent('host', self::TYPE_RAW);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getHost(): ?string
         {
             return $this->getComponent('host', self::TYPE_NORMALIZED);
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withHost(?string $encodedHost): self
         {
@@ -300,18 +256,13 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getPort(): ?int
         {
-            $this->assertIsInitialized();
-
             return $this->rawComponents['port'];
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withPort(?int $port): self
         {
@@ -322,24 +273,18 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawPath(): ?string
         {
             return $this->getComponent('path', self::TYPE_RAW);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getPath(): ?string
         {
             return $this->getComponent('path', self::TYPE_NORMALIZED);
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withPath(?string $encodedPath): self
         {
@@ -350,24 +295,18 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawQuery(): ?string
         {
             return $this->getComponent('query', self::TYPE_RAW);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getQuery(): ?string
         {
             return $this->getComponent('query', self::TYPE_NORMALIZED);
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withQuery(?string $encodedQuery): self
         {
@@ -378,24 +317,18 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getRawFragment(): ?string
         {
             return $this->getComponent('fragment', self::TYPE_RAW);
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function getFragment(): ?string
         {
             return $this->getComponent('fragment', self::TYPE_NORMALIZED);
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function withFragment(?string $encodedFragment): self
         {
@@ -407,7 +340,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @throws UninitializedUriError
+         * @throws Exception
          */
         public function equals(self $uri, bool $excludeFragment = true): bool
         {
@@ -418,22 +351,13 @@ if (PHP_VERSION_ID < 80500) {
             return $this->normalizedComponents === $uri->normalizedComponents;
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function toRawString(): string
         {
-            $this->assertIsInitialized();
-
             return $this->rawUri;
         }
 
-        /**
-         * @throws UninitializedUriError
-         */
         public function toString(): string
         {
-            $this->assertIsInitialized();
             $this->setNormalizedComponents();
             $this->normalizedUri ??= UriString::build($this->normalizedComponents);
 
@@ -441,7 +365,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws InvalidUriException
          */
         public function resolve(string $uri): self
         {
@@ -459,17 +383,16 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @param array{__uri:string} $data
          *
-         * @throws UninitializedUriError|InvalidUriException
+         * @throws Exception|InvalidUriException
          */
         public function __unserialize(array $data): void
         {
-            $uri = new self($data['__uri'] ?? throw new UninitializedUriError('The `__uri` property is missing from the serialized object.'));
+            $uri = new self($data['__uri'] ?? throw new Exception('The `__uri` property is missing from the serialized object.'));
 
             $this->rawComponents = $uri->rawComponents;
             $this->rawUri = $uri->rawUri;
             $this->normalizedComponents = self::DEFAULT_COMPONENTS;
             $this->normalizedUri = null;
-            $this->isInitialized = true;
         }
 
         /**
@@ -477,8 +400,6 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __debugInfo(): array
         {
-            $this->assertIsInitialized();
-
             return [
                 'scheme' => $this->rawComponents['scheme'],
                 'user' => $this->rawComponents['user'],

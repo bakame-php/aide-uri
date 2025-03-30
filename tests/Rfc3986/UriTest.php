@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Uri\Rfc3986;
 
+use Error;
+use Exception;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +41,7 @@ final class UriTest extends TestCase
         $reflection = new ReflectionClass(Uri::class);
         $uri = $reflection->newInstanceWithoutConstructor();
 
-        $this->expectException(UninitializedUriError::class);
+        $this->expectException(Error::class);
         $uri->toRawString();
     }
 
@@ -124,7 +126,7 @@ final class UriTest extends TestCase
     #[Test]
     public function it_exposes_raw_and_normalizes_uri_and_components(): void
     {
-        $uri = new Uri("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc");
+        $uri = new Uri("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc");
 
         self::assertSame('https', $uri->getRawScheme());
         self::assertSame('https', $uri->getScheme());
@@ -138,8 +140,8 @@ final class UriTest extends TestCase
         self::assertSame('p%61ss', $uri->getRawPassword());
         self::assertSame('pass', $uri->getPassword());
 
-        self::assertSame('ex%61mple.com', $uri->getRawHost());
-        self::assertSame('example.com', $uri->getHost());
+        self::assertSame('b%C3%A9b%C3%A9.be', $uri->getRawHost());
+        self::assertSame('xn--bb-bjab.be', $uri->getHost());
 
         self::assertSame(433, $uri->getPort());
 
@@ -152,8 +154,8 @@ final class UriTest extends TestCase
         self::assertSame('%61bc', $uri->getRawFragment());
         self::assertSame('abc', $uri->getFragment());
 
-        self::assertSame("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc", $uri->toRawString());
-        self::assertSame("https://apple:pass@example.com:433/foobar?abc=abc#abc", $uri->toString());
+        self::assertSame("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc", $uri->toRawString());
+        self::assertSame("https://apple:pass@xn--bb-bjab.be:433/foobar?abc=abc#abc", $uri->toString());
     }
 
     #[Test]
@@ -205,11 +207,11 @@ final class UriTest extends TestCase
     #[Test]
     public function it_can_be_modified_using_its_components(): void
     {
-        $uri = new Uri("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc");
+        $uri = new Uri("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc");
         $uriBis = $uri
             ->withScheme('https')
             ->withUserInfo('apple:pass')
-            ->withHost('example.com')
+            ->withHost('b%C3%A9b%C3%A9.be')
             ->withPort(433)
             ->withPath('/foobar')
             ->withQuery('abc=abc')
@@ -221,7 +223,7 @@ final class UriTest extends TestCase
             'scheme' => 'https',
             'user' => 'apple',
             'password' => 'pass',
-            'host' => 'example.com',
+            'host' => 'b%C3%A9b%C3%A9.be',
             'port' => 433,
             'path' => '/foobar',
             'query' => 'abc=abc',
