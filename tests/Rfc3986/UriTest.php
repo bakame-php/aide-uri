@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace Uri\Rfc3986;
 
 use Error;
-use Exception;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
-use Uri\UninitializedUriError;
 
 #[CoversClass(Uri::class)]
+#[CoversClass(InvalidUriException::class)]
 final class UriTest extends TestCase
 {
     #[Test]
@@ -286,5 +285,30 @@ final class UriTest extends TestCase
         $uriStripped = $uriWithUserAndPassword->withUserInfo(null);
         self::assertTrue($uriStripped->equals($uri1));
         self::assertTrue($uriStripped->withUserInfo(null)->equals($uriStripped));
+    }
+
+    #[Test]
+    public function it_can_not_update_invalid_path_according_to_rfc3986(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new Uri("foo/bar"))->withPath('//foo');
+    }
+
+    #[Test]
+    public function it_can_not_update_invalid_host_according_to_rfc3986(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new Uri("foo/bar"))->withHost('ex%61mple.com');
+    }
+
+    #[Test]
+    public function it_parses_an_uri_but_does_not_enforces_http_specific_validation(): void
+    {
+        self::assertSame(
+            'https:example.com',
+            (new Uri("example.com"))->withScheme('https')->toString()
+        );
     }
 }

@@ -371,7 +371,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{__uri:string}
+         * @return array{__uri: string}
          */
         public function __serialize(): array
         {
@@ -379,7 +379,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param array{__uri:string} $data
+         * @param array{__uri: string} $data
          *
          * @throws Exception|InvalidUriException
          */
