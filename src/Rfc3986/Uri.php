@@ -45,8 +45,8 @@ if (PHP_VERSION_ID < 80500) {
         private readonly array $rawComponents;
         private readonly string $rawUri;
         /** @var Components */
-        private array $normalizedComponents = self::DEFAULT_COMPONENTS;
-        private ?string $normalizedUri = null;
+        private array $normalizedComponents;
+        private ?string $normalizedUri;
 
         /**
          * @throws InvalidUriException
@@ -65,6 +65,8 @@ if (PHP_VERSION_ID < 80500) {
 
             $this->rawComponents = self::addUserInfo($components);
             $this->rawUri = $uri;
+            $this->normalizedUri = null;
+            $this->normalizedComponents = self::DEFAULT_COMPONENTS;
         }
 
         /**
@@ -119,6 +121,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
                 $this->normalizedComponents = self::addUserInfo(UriString::parseNormalized($this->toRawString()));
+                // We convert the host separately because the current RFC does not handle IDNA
                 $this->normalizedComponents['host'] = Encoder::normalizeHost($this->rawComponents['host']);
             }
         }
@@ -128,17 +131,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         private function getComponent(string $name, string $type): ?string
         {
-            if (self::TYPE_RAW === $type) {
-                $value = $this->rawComponents[$name];
-                if (null === $value) {
-                    return null;
-                }
-
-                return (string) $value;
+            if (self::TYPE_NORMALIZED === $type) {
+                $this->setNormalizedComponents();
             }
 
-            $this->setNormalizedComponents();
-            $value = $this->normalizedComponents[$name];
+            $value = self::TYPE_NORMALIZED === $type ? $this->normalizedComponents[$name] : $this->rawComponents[$name];
             if (null === $value) {
                 return null;
             }
