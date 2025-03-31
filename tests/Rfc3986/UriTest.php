@@ -141,7 +141,7 @@ final class UriTest extends TestCase
         self::assertSame('pass', $uri->getPassword());
 
         self::assertSame('b%C3%A9b%C3%A9.be', $uri->getRawHost());
-        self::assertSame('xn--bb-bjab.be', $uri->getHost());
+        self::assertSame('b%C3%A9b%C3%A9.be', $uri->getHost());
 
         self::assertSame(433, $uri->getPort());
 
@@ -155,7 +155,7 @@ final class UriTest extends TestCase
         self::assertSame('abc', $uri->getFragment());
 
         self::assertSame("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc", $uri->toRawString());
-        self::assertSame("https://apple:pass@xn--bb-bjab.be:433/foobar?abc=abc#abc", $uri->toString());
+        self::assertSame("https://apple:pass@b%C3%A9b%C3%A9.be:433/foobar?abc=abc#abc", $uri->toString());
     }
 
     #[Test]
@@ -237,7 +237,7 @@ final class UriTest extends TestCase
         $uri = new Uri("https://www.b%C3%A9b%C3%A9.be#foobar");
 
         self::assertSame('www.b%C3%A9b%C3%A9.be', $uri->getRawHost());
-        self::assertSame('www.xn--bb-bjab.be', $uri->getHost());
+        self::assertSame('www.b%C3%A9b%C3%A9.be', $uri->getHost());
     }
 
     #[Test]
