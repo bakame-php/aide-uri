@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
+use const PHP_EOL;
 
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
@@ -31,7 +32,7 @@ final class UriTest extends TestCase
 
         self::assertInstanceOf(Uri::class, $uri);
         self::assertSame('http://example.com', $uri->toRawString());
-        self::assertSame('http://example.com/', $uri->toString());
+        self::assertSame('http://example.com', $uri->toString());
     }
 
     #[Test]
@@ -285,6 +286,14 @@ final class UriTest extends TestCase
         $uriStripped = $uriWithUserAndPassword->withUserInfo(null);
         self::assertTrue($uriStripped->equals($uri1));
         self::assertTrue($uriStripped->withUserInfo(null)->equals($uriStripped));
+    }
+
+    #[Test]
+    public function it_can_noemalize_ip_v6_host(): void
+    {
+        $uri = new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo=bar%26baz%3Dqux");
+
+        self::assertSame("https://[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]?foo=bar%26baz%3Dqux", $uri->toString());
     }
 
     #[Test]
