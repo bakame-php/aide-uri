@@ -21,7 +21,6 @@ use Uri\InvalidUriException;
 
 use function explode;
 use function preg_match;
-use function str_contains;
 
 use const PHP_VERSION_ID;
 
@@ -120,9 +119,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
                 $this->normalizedComponents = self::addUserInfo(UriString::parseNormalized($this->toRawString()));
-                if (isset($this->rawComponents['host']) && str_contains($this->rawComponents['host'], '%')) {
-                    $this->normalizedComponents['host'] = $this->rawComponents['host'];
-                }
+                $this->normalizedComponents['host'] = Encoder::normalizeHost($this->rawComponents['host']);
             }
         }
 
