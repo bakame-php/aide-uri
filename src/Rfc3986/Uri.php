@@ -129,7 +129,7 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @param self::TYPE_RAW|self::TYPE_NORMALIZED $type
          */
-        private function getComponent(string $name, string $type): ?string
+        private function getComponent(string $type, string $name): ?string
         {
             if (self::TYPE_NORMALIZED === $type) {
                 $this->setNormalizedComponents();
@@ -161,12 +161,12 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getScheme(): ?string
         {
-            return $this->getComponent('scheme', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'scheme');
         }
 
         public function getRawScheme(): ?string
         {
-            return $this->getComponent('scheme', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'scheme');
         }
 
         /**
@@ -183,12 +183,12 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getUserInfo(): ?string
         {
-            return $this->getComponent('userInfo', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'userInfo');
         }
 
         public function getRawUserInfo(): ?string
         {
-            return $this->getComponent('userInfo', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'userInfo');
         }
 
         /**
@@ -214,32 +214,32 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getRawUser(): ?string
         {
-            return $this->getComponent('user', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'user');
         }
 
         public function getUser(): ?string
         {
-            return $this->getComponent('user', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'user');
         }
 
         public function getRawPassword(): ?string
         {
-            return $this->getComponent('pass', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'pass');
         }
 
         public function getPassword(): ?string
         {
-            return $this->getComponent('pass', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'pass');
         }
 
         public function getRawHost(): ?string
         {
-            return $this->getComponent('host', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'host');
         }
 
         public function getHost(): ?string
         {
-            return $this->getComponent('host', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'host');
         }
 
         /**
@@ -273,12 +273,12 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getRawPath(): ?string
         {
-            return $this->getComponent('path', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'path');
         }
 
         public function getPath(): ?string
         {
-            return $this->getComponent('path', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'path');
         }
 
         /**
@@ -295,12 +295,12 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getRawQuery(): ?string
         {
-            return $this->getComponent('query', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'query');
         }
 
         public function getQuery(): ?string
         {
-            return $this->getComponent('query', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'query');
         }
 
         /**
@@ -317,12 +317,12 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getRawFragment(): ?string
         {
-            return $this->getComponent('fragment', self::TYPE_RAW);
+            return $this->getComponent(self::TYPE_RAW, 'fragment');
         }
 
         public function getFragment(): ?string
         {
-            return $this->getComponent('fragment', self::TYPE_NORMALIZED);
+            return $this->getComponent(self::TYPE_NORMALIZED, 'fragment');
         }
 
         /**
