@@ -45,8 +45,9 @@ if (PHP_VERSION_ID < 80500) {
         private readonly array $rawComponents;
         private readonly string $rawUri;
         /** @var Components */
-        private array $normalizedComponents;
-        private ?string $normalizedUri;
+        private array $normalizedComponents = self::DEFAULT_COMPONENTS;
+        private ?string $normalizedUri = null;
+        private bool $isNormalized;
 
         /**
          * @throws InvalidUriException
@@ -65,8 +66,7 @@ if (PHP_VERSION_ID < 80500) {
 
             $this->rawComponents = self::addUserInfo($components);
             $this->rawUri = $uri;
-            $this->normalizedUri = null;
-            $this->normalizedComponents = self::DEFAULT_COMPONENTS;
+            $this->isNormalized = false;
         }
 
         /**
@@ -119,10 +119,11 @@ if (PHP_VERSION_ID < 80500) {
 
         private function setNormalizedComponents(): void
         {
-            if (self::DEFAULT_COMPONENTS === $this->normalizedComponents) {
+            if (!$this->isNormalized) {
                 $this->normalizedComponents = self::addUserInfo(UriString::parseNormalized($this->toRawString()));
                 // We convert the host separately because the current RFC does not handle IDNA
                 $this->normalizedComponents['host'] = Encoder::normalizeHost($this->rawComponents['host']);
+                $this->isNormalized = true;
             }
         }
 
@@ -389,8 +390,7 @@ if (PHP_VERSION_ID < 80500) {
 
             $this->rawComponents = $uri->rawComponents;
             $this->rawUri = $uri->rawUri;
-            $this->normalizedComponents = self::DEFAULT_COMPONENTS;
-            $this->normalizedUri = null;
+            $this->isNormalized = false;
         }
 
         /**

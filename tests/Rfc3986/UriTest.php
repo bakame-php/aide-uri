@@ -118,7 +118,8 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo=bar%26baz%3Dqux");
 
-        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getHost());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getRawHost());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getHost());
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getQuery());
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
     }
@@ -192,7 +193,7 @@ final class UriTest extends TestCase
         $uri1 = new Uri('http://example.com#foobar');
         $uri2 = new Uri('http://example.com');
 
-        self::assertTrue($uri1->equals($uri2, true));
+        self::assertTrue($uri1->equals($uri2));
         self::assertFalse($uri1->equals($uri2, false));
     }
 
