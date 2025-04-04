@@ -74,6 +74,45 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
+         * @return array{__uri: string}
+         */
+        public function __serialize(): array
+        {
+            return ['__uri' => $this->toRawString()];
+        }
+
+        /**
+         * @param array{__uri: string} $data
+         *
+         * @throws Exception|InvalidUriException
+         */
+        public function __unserialize(array $data): void
+        {
+            $uri = new self($data['__uri'] ?? throw new Exception('The `__uri` property is missing from the serialized object.'));
+
+            $this->rawComponents = $uri->rawComponents;
+            $this->rawUri = $uri->rawUri;
+            $this->isNormalized = false;
+        }
+
+        /**
+         * @return array{scheme: ?string, user: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
+         */
+        public function __debugInfo(): array
+        {
+            return [
+                'scheme' => $this->rawComponents['scheme'],
+                'user' => $this->rawComponents['user'],
+                'password' => $this->rawComponents['pass'],
+                'host' => $this->rawComponents['host'],
+                'port' => $this->rawComponents['port'],
+                'path' => $this->rawComponents['path'],
+                'query' => $this->rawComponents['query'],
+                'fragment' => $this->rawComponents['fragment'],
+            ];
+        }
+
+        /**
          * @throws InvalidUriException
          */
         private static function assertUriContainsValidRfc3986Characters(?string $uri): void
@@ -374,45 +413,6 @@ if (PHP_VERSION_ID < 80500) {
         public function resolve(string $uri): self
         {
             return new self($uri, $this->toRawString());
-        }
-
-        /**
-         * @return array{__uri: string}
-         */
-        public function __serialize(): array
-        {
-            return ['__uri' => $this->toRawString()];
-        }
-
-        /**
-         * @param array{__uri: string} $data
-         *
-         * @throws Exception|InvalidUriException
-         */
-        public function __unserialize(array $data): void
-        {
-            $uri = new self($data['__uri'] ?? throw new Exception('The `__uri` property is missing from the serialized object.'));
-
-            $this->rawComponents = $uri->rawComponents;
-            $this->rawUri = $uri->rawUri;
-            $this->isNormalized = false;
-        }
-
-        /**
-         * @return array{scheme: ?string, user: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
-         */
-        public function __debugInfo(): array
-        {
-            return [
-                'scheme' => $this->rawComponents['scheme'],
-                'user' => $this->rawComponents['user'],
-                'password' => $this->rawComponents['pass'],
-                'host' => $this->rawComponents['host'],
-                'port' => $this->rawComponents['port'],
-                'path' => $this->rawComponents['path'],
-                'query' => $this->rawComponents['query'],
-                'fragment' => $this->rawComponents['fragment'],
-            ];
         }
     }
 }
