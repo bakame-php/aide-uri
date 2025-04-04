@@ -64,7 +64,14 @@ if (PHP_VERSION_ID < 80500) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
             }
 
-            self::validateComponents($components);
+            UriString::isScheme($components['scheme']) || throw new InvalidUriException('The scheme string component `'.$components['scheme'].'` is an invalid scheme.');
+            Encoder::isUserEncoded($components['user']) || throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
+            Encoder::isPasswordEncoded($components['pass']) || throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
+            UriString::isHost($components['host']) || throw new InvalidUriException('The host component value `'.$components['host'].'` is not a valid host.');
+            Encoder::isPathEncoded($components['path']) || throw new InvalidUriException('The encoded path component `'.$components['path'].'` contains invalid characters.');
+            Encoder::isQueryEncoded($components['query']) || throw new InvalidUriException('The encoded query string component `'.$components['query'].'` contains invalid characters.');
+            Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The encoded fragment string component `'.$components['fragment'].'` contains invalid characters.');
+
             $this->rawUri = $uri;
             $this->rawComponents = self::addUserInfo($components);
         }
@@ -106,22 +113,6 @@ if (PHP_VERSION_ID < 80500) {
             $components['userInfo'] .= ':'.$components['pass'];
 
             return $components;
-        }
-
-        /**
-         * @param ComponentMap $components
-         *
-         * @throws InvalidUriException
-         */
-        private static function validateComponents(array $components): void
-        {
-            UriString::isScheme($components['scheme']) || throw new InvalidUriException('The scheme string component `'.$components['scheme'].'` is an invalid scheme.');
-            Encoder::isUserEncoded($components['user']) || throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
-            Encoder::isPasswordEncoded($components['pass']) || throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
-            UriString::isHost($components['host']) || throw new InvalidUriException('The host component value `'.$components['host'].'` is not a valid host.');
-            Encoder::isPathEncoded($components['path']) || throw new InvalidUriException('The encoded path component `'.$components['path'].'` contains invalid characters.');
-            Encoder::isQueryEncoded($components['query']) || throw new InvalidUriException('The encoded query string component `'.$components['query'].'` contains invalid characters.');
-            Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The encoded fragment string component `'.$components['fragment'].'` contains invalid characters.');
         }
 
         public static function parse(string $uri, ?string $baseUri = null): ?Uri
