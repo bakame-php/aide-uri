@@ -74,45 +74,6 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{__uri: string}
-         */
-        public function __serialize(): array
-        {
-            return ['__uri' => $this->toRawString()];
-        }
-
-        /**
-         * @param array{__uri: string} $data
-         *
-         * @throws Exception|InvalidUriException
-         */
-        public function __unserialize(array $data): void
-        {
-            $uri = new self($data['__uri'] ?? throw new Exception('The `__uri` property is missing from the serialized object.'));
-
-            $this->rawComponents = $uri->rawComponents;
-            $this->rawUri = $uri->rawUri;
-            $this->isNormalized = false;
-        }
-
-        /**
-         * @return array{scheme: ?string, user: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
-         */
-        public function __debugInfo(): array
-        {
-            return [
-                'scheme' => $this->rawComponents['scheme'],
-                'user' => $this->rawComponents['user'],
-                'password' => $this->rawComponents['pass'],
-                'host' => $this->rawComponents['host'],
-                'port' => $this->rawComponents['port'],
-                'path' => $this->rawComponents['path'],
-                'query' => $this->rawComponents['query'],
-                'fragment' => $this->rawComponents['fragment'],
-            ];
-        }
-
-        /**
          * @throws InvalidUriException
          */
         private static function assertUriContainsValidRfc3986Characters(?string $uri): void
@@ -160,17 +121,6 @@ if (PHP_VERSION_ID < 80500) {
             }
         }
 
-        private function setNormalizedComponents(): void
-        {
-            if (!$this->isNormalized) {
-                $this->normalizedComponents = [
-                    ...self::addUserInfo(UriString::parseNormalized($this->rawUri)),
-                    ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
-                ];
-                $this->isNormalized = true;
-            }
-        }
-
         /**
          * @param self::TYPE_RAW|self::TYPE_NORMALIZED $type
          */
@@ -186,6 +136,17 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             return (string) $value;
+        }
+
+        private function setNormalizedComponents(): void
+        {
+            if (!$this->isNormalized) {
+                $this->normalizedComponents = [
+                    ...self::addUserInfo(UriString::parseNormalized($this->rawUri)),
+                    ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
+                ];
+                $this->isNormalized = true;
+            }
         }
 
         /**
@@ -217,12 +178,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withScheme(?string $encodedScheme): self
+        public function withScheme(?string $scheme): self
         {
             return match (true) {
-                $encodedScheme === $this->getRawScheme() => $this,
-                UriString::isScheme($encodedScheme) => $this->withComponent(['scheme' => $encodedScheme]),
-                default => throw new InvalidUriException('The scheme string component `'.$encodedScheme.'` is an invalid scheme.'),
+                $scheme === $this->getRawScheme() => $this,
+                UriString::isScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
+                default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
             };
         }
 
@@ -239,17 +200,17 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withUserInfo(#[SensitiveParameter] ?string $encodedUserInfo): self
+        public function withUserInfo(#[SensitiveParameter] ?string $userInfo): self
         {
-            if ($encodedUserInfo === $this->getRawUserInfo()) {
+            if ($userInfo === $this->getRawUserInfo()) {
                 return $this;
             }
 
-            if (null === $encodedUserInfo) {
+            if (null === $userInfo) {
                 return $this->withComponent(['user' => null, 'pass' => null]);
             }
 
-            [$user, $password] = explode(':', $encodedUserInfo, 2) + [1 => null];
+            [$user, $password] = explode(':', $userInfo, 2) + [1 => null];
             if (!Encoder::isUserEncoded($user) || !Encoder::isPasswordEncoded($password)) {
                 throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
             }
@@ -290,12 +251,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withHost(?string $encodedHost): self
+        public function withHost(?string $host): self
         {
             return match (true) {
-                $encodedHost === $this->getRawHost() => $this,
-                UriString::isHost($encodedHost) => $this->withComponent(['host' => $encodedHost]),
-                default => throw new InvalidUriException('The host component value `'.$encodedHost.'` is not a valid host.'),
+                $host === $this->getRawHost() => $this,
+                UriString::isHost($host) => $this->withComponent(['host' => $host]),
+                default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
             };
         }
 
@@ -329,12 +290,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withPath(?string $encodedPath): self
+        public function withPath(?string $path): self
         {
             return match (true) {
-                $encodedPath === $this->getRawPath() => $this,
-                Encoder::isPathEncoded($encodedPath) => $this->withComponent(['path' => $encodedPath]),
-                default => throw new InvalidUriException('The encoded path component `'.$encodedPath.'` contains invalid characters.'),
+                $path === $this->getRawPath() => $this,
+                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
+                default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
             };
         }
 
@@ -351,12 +312,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withQuery(?string $encodedQuery): self
+        public function withQuery(?string $query): self
         {
             return match (true) {
-                $encodedQuery === $this->getRawQuery() => $this,
-                Encoder::isQueryEncoded($encodedQuery) => $this->withComponent(['query' => $encodedQuery]),
-                default => throw new InvalidUriException('The encoded query string component `'.$encodedQuery.'` contains invalid characters.'),
+                $query === $this->getRawQuery() => $this,
+                Encoder::isQueryEncoded($query) => $this->withComponent(['query' => $query]),
+                default => throw new InvalidUriException('The encoded query string component `'.$query.'` contains invalid characters.'),
             };
         }
 
@@ -373,12 +334,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withFragment(?string $encodedFragment): self
+        public function withFragment(?string $fragment): self
         {
             return match (true) {
-                $encodedFragment === $this->getRawFragment() => $this,
-                Encoder::isFragmentEncoded($encodedFragment) => $this->withComponent(['fragment' => $encodedFragment]),
-                default => throw new InvalidUriException('The encoded fragment string component `'.$encodedFragment.'` contains invalid characters.'),
+                $fragment === $this->getRawFragment() => $this,
+                Encoder::isFragmentEncoded($fragment) => $this->withComponent(['fragment' => $fragment]),
+                default => throw new InvalidUriException('The encoded fragment string component `'.$fragment.'` contains invalid characters.'),
             };
         }
 
@@ -413,6 +374,45 @@ if (PHP_VERSION_ID < 80500) {
         public function resolve(string $uri): self
         {
             return new self($uri, $this->toRawString());
+        }
+
+        /**
+         * @return array{__uri: string}
+         */
+        public function __serialize(): array
+        {
+            return ['__uri' => $this->toRawString()];
+        }
+
+        /**
+         * @param array{__uri: string} $data
+         *
+         * @throws Exception|InvalidUriException
+         */
+        public function __unserialize(array $data): void
+        {
+            $uri = new self($data['__uri'] ?? throw new Exception('The `__uri` property is missing from the serialized object.'));
+
+            $this->rawComponents = $uri->rawComponents;
+            $this->rawUri = $uri->rawUri;
+            $this->isNormalized = false;
+        }
+
+        /**
+         * @return array{scheme: ?string, user: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
+         */
+        public function __debugInfo(): array
+        {
+            return [
+                'scheme' => $this->rawComponents['scheme'],
+                'user' => $this->rawComponents['user'],
+                'password' => $this->rawComponents['pass'],
+                'host' => $this->rawComponents['host'],
+                'port' => $this->rawComponents['port'],
+                'path' => $this->rawComponents['path'],
+                'query' => $this->rawComponents['query'],
+                'fragment' => $this->rawComponents['fragment'],
+            ];
         }
     }
 }
