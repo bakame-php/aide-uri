@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
-use const PHP_EOL;
 
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
@@ -120,8 +119,12 @@ final class UriTest extends TestCase
 
         self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getRawHost());
         self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getHost());
+
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getQuery());
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
+
+        self::assertSame('/', $uri->getRawPath());
+        self::assertSame('', $uri->getPath());
     }
 
     #[Test]
@@ -200,9 +203,10 @@ final class UriTest extends TestCase
     #[Test]
     public function it_can_resolve_uri(): void
     {
-        $uri = new Uri("https://example.com");
-
-        self::assertSame("https://example.com/foo", $uri->resolve("/foo")->toString());
+        self::assertSame(
+            "https://example.com/foo",
+            (new Uri("https://example.com"))->resolve("/foo")->toString()
+        );
     }
 
     #[Test]
@@ -294,7 +298,10 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo=bar%26baz%3Dqux");
 
-        self::assertSame("https://[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]?foo=bar%26baz%3Dqux", $uri->toString());
+        self::assertSame(
+            "https://[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]?foo=bar%26baz%3Dqux",
+            $uri->toString()
+        );
     }
 
     #[Test]
@@ -320,5 +327,13 @@ final class UriTest extends TestCase
             'https:example.com',
             (new Uri("example.com"))->withScheme('https')->toString()
         );
+    }
+
+    #[Test]
+    public function it_fails_parsing_an_malformed_uri_with_invalid_query_encoding(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo[]=1&foo[]=2");
     }
 }
