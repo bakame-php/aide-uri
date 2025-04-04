@@ -20,7 +20,6 @@ use SensitiveParameter;
 use Uri\InvalidUriException;
 
 use function explode;
-use function preg_match;
 
 use const PHP_VERSION_ID;
 
@@ -80,7 +79,7 @@ if (PHP_VERSION_ID < 80500) {
         private static function assertUriContainsValidRfc3986Characters(?string $uri): void
         {
             null === $uri
-            || 1 === preg_match('/^(?:[A-Za-z0-9\-._~:\/?#[\]@!$&\'()*+,;=%]|%[0-9A-Fa-f]{2})*$/', $uri)
+            || UriString::containsValidRfc3986Characters($uri)
             || throw new InvalidUriException('The URI `'.$uri.'` contains invalid RFC3986 characters.');
         }
 
