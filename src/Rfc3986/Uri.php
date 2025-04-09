@@ -58,7 +58,7 @@ if (PHP_VERSION_ID < 80500) {
 
             try {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
-                $components = UriString::parse($uri);
+                $components = self::addUserInfo(UriString::parse($uri));
             } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
             }
@@ -70,7 +70,7 @@ if (PHP_VERSION_ID < 80500) {
             Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The encoded fragment string component `'.$components['fragment'].'` contains invalid characters.');
 
             $this->rawUri = $uri;
-            $this->rawComponents = self::addUserInfo($components);
+            $this->rawComponents = $components;
         }
 
         /**
@@ -140,13 +140,15 @@ if (PHP_VERSION_ID < 80500) {
 
         private function setNormalizedComponents(): void
         {
-            if (!$this->isNormalized) {
-                $this->normalizedComponents = [
-                    ...self::addUserInfo(UriString::parseNormalized($this->rawUri)),
-                    ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
-                ];
-                $this->isNormalized = true;
+            if ($this->isNormalized) {
+                return;
             }
+
+            $this->normalizedComponents = [
+                ...self::addUserInfo(UriString::parseNormalized($this->rawUri)),
+                ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
+            ];
+            $this->isNormalized = true;
         }
 
         /**
