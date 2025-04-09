@@ -63,8 +63,8 @@ if (PHP_VERSION_ID < 80500) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
             }
 
-            Encoder::isUserEncoded($components['user']) || throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
-            Encoder::isPasswordEncoded($components['pass']) || throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
+            Encoder::isUserEncoded($components['user']) || throw new InvalidUriException('The encoded userInfo string component `'.$components['userInfo'].'` contains invalid characters.');
+            Encoder::isPasswordEncoded($components['pass']) || throw new InvalidUriException('The encoded userInfo component `'.$components['userInfo'].'` contains invalid characters.');
             Encoder::isPathEncoded($components['path']) || throw new InvalidUriException('The encoded path component `'.$components['path'].'` contains invalid characters.');
             Encoder::isQueryEncoded($components['query']) || throw new InvalidUriException('The encoded query string component `'.$components['query'].'` contains invalid characters.');
             Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The encoded fragment string component `'.$components['fragment'].'` contains invalid characters.');
@@ -204,7 +204,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withUserInfo(#[SensitiveParameter] ?string $userInfo): self
         {
-            if ($userInfo === $this->getRawUserInfo()) {
+            if ($this->getRawUserInfo() === $userInfo) {
                 return $this;
             }
 
@@ -213,9 +213,8 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             [$user, $password] = explode(':', $userInfo, 2) + [1 => null];
-            if (!Encoder::isUserEncoded($user) || !Encoder::isPasswordEncoded($password)) {
-                throw new InvalidUriException('The encoded userInfo string component contains invalid characters.');
-            }
+            Encoder::isUserEncoded($user) || throw new InvalidUriException('The encoded userInfo string component `'.$userInfo.'` contains invalid characters.');
+            Encoder::isPasswordEncoded($password) || throw new InvalidUriException('The encoded userInfo string component `'.$userInfo.'` contains invalid characters.');
 
             return $this->withComponent(['user' => $user, 'pass' => $password]);
         }
@@ -350,11 +349,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function equals(self $uri, bool $excludeFragment = true): bool
         {
-            if ($excludeFragment && ($this->getFragment() !== $uri->getFragment())) {
-                return [...$this->normalizedComponents, ...['fragment' => null]] === [...$uri->normalizedComponents, ...['fragment' => null]];
-            }
-
-            return $this->normalizedComponents === $uri->normalizedComponents;
+            return match (true) {
+                $this->getFragment() === $uri->getFragment(),
+                ! $excludeFragment => $this->normalizedComponents === $uri->normalizedComponents,
+                default => [...$this->normalizedComponents, ...['fragment' => null]] === [...$uri->normalizedComponents, ...['fragment' => null]],
+            };
         }
 
         public function toRawString(): string
