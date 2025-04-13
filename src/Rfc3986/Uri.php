@@ -46,7 +46,7 @@ if (PHP_VERSION_ID < 80500) {
         /** @var Components */
         private array $normalizedComponents = self::DEFAULT_COMPONENTS;
         private ?string $normalizedUri = null;
-        private bool $isNormalized = false;
+        private bool $isNormalized;
 
         /**
          * @throws InvalidUriException
@@ -71,6 +71,7 @@ if (PHP_VERSION_ID < 80500) {
 
             $this->rawUri = $uri;
             $this->rawComponents = $components;
+            $this->isNormalized = false;
         }
 
         /**
