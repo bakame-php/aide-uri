@@ -20,17 +20,9 @@ use const PHP_VERSION_ID;
 if (PHP_VERSION_ID < 80500) {
     class InvalidUriException extends UriException
     {
-        /** @var array<int, string> $errors */
-        public readonly array $errors;
-
-        /**
-         * @param array<int, string> $errors
-         */
-        public function __construct(string $message, int $code = 0, ?Exception $previous = null, array $errors = [])
+        public function __construct(string $message, int $code = 0, ?Exception $previous = null)
         {
             parent::__construct('URI parsing failed; '.$message, $code, $previous);
-
-            $this->errors = $errors;
         }
     }
 }
