@@ -77,38 +77,51 @@ final class ValidationErrorLogger extends AbstractLogger
         $this->errors[] = new UrlValidationError(
             $errorContext,
             match ((string) $message) {
-                // recoverable errors
+                'missing-scheme-non-relative-URL' => UrlValidationErrorType::MissingSchemeNonRelativeUrl,
                 'special-scheme-missing-following-solidus' => UrlValidationErrorType::SpecialSchemeMissingFollowingSolidus,
-                'invalid-URL-unit' => UrlValidationErrorType::InvalidUrlUnit,
+                'invalid-credentials' => UrlValidationErrorType::InvalidCredentials,
+                'invalid-reverse-solidus' => UrlValidationErrorType::InvalidReverseSoldius,
+                'domain-to-ASCII' => UrlValidationErrorType::DomainToAscii,
+                'domain-to-unicode' => UrlValidationErrorType::DomainToUnicode,
+                'domain-invalid-code-point' => UrlValidationErrorType::DomainInvalidCodePoint,
+                'host-invalid-code-point' => UrlValidationErrorType::HostInvalidCodePoint,
                 'IPv4-part-empty' => UrlValidationErrorType::Ipv4EmptyPart,
                 'IPv4-non-decimal-part' => UrlValidationErrorType::Ipv4NonDecimalPart,
-                'invalid-credentials' => UrlValidationErrorType::InvalidCredentials,
-                'file-invalid-Windows-drive-letter-host' => UrlValidationErrorType::FileInvalidWindowsDriveLetterHost,
-                'invalid-reverse-solidus' => UrlValidationErrorType::InvalidReverseSoldius,
-                'file-invalid-Windows-drive-letter' => UrlValidationErrorType::FileInvalidWindowsDriveLetter,
-                // unrecoverable errors
-                'IPv6-unclosed' => UrlValidationErrorType::Ipv6Unclosed,
-                'missing-scheme-non-relative-URL' => UrlValidationErrorType::MissingSchemeNonRelativeUrl,
-                'domain-invalid-code-point' => UrlValidationErrorType::DomainInvalidCodePoint,
-                'domain-to-ASCII' => UrlValidationErrorType::DomainToAscii,
-                'host-invalid-code-point' => UrlValidationErrorType::HostInvalidCodePoint,
                 'IPv4-too-many-parts' => UrlValidationErrorType::Ipv4TooManyParts,
                 'IPv4-non-numeric-part' => UrlValidationErrorType::Ipv4NonNumericPart,
+                'IPv4-out-of-range-part' => UrlValidationErrorType::Ipv4OutOfRangePart,
                 'IPv6-invalid-compression' => UrlValidationErrorType::Ipv6InvalidCompression,
-                'IPv6-too-many-pieces' => UrlValidationErrorType::Ipv6TooManyPieces,
-                'IPv6-multiple-compression' => UrlValidationErrorType::Ipv6MultipleCompression,
-                'IPv4-in-IPv6-invalid-code-point' => UrlValidationErrorType::Ipv4InIpv6InvalidCodePoint,
-                'IPv4-in-IPv6-too-many-pieces' => UrlValidationErrorType::Ipv4InIpv6TooManyPieces,
                 'IPv6-invalid-code-point' => UrlValidationErrorType::Ipv6InvalidCodePoint,
+                'IPv6-multiple-compression' => UrlValidationErrorType::Ipv6MultipleCompression,
                 'IPv6-too-few-pieces' => UrlValidationErrorType::Ipv6TooFewPieces,
+                'IPv6-too-many-pieces' => UrlValidationErrorType::Ipv6TooManyPieces,
+                'IPv6-unclosed' => UrlValidationErrorType::Ipv6Unclosed,
                 'IPv4-in-IPv6-out-of-range-part' => UrlValidationErrorType::Ipv4InIpv6OutOfRangePart,
                 'IPv4-in-IPv6-too-few-parts' => UrlValidationErrorType::Ipv4InIpv6TooFewParts,
+                'IPv4-in-IPv6-invalid-code-point' => UrlValidationErrorType::Ipv4InIpv6InvalidCodePoint,
+                'IPv4-in-IPv6-too-many-pieces' => UrlValidationErrorType::Ipv4InIpv6TooManyPieces,
                 'host-missing' => UrlValidationErrorType::HostMissing,
                 'port-out-of-range' => UrlValidationErrorType::PortOutOfRange,
                 'port-invalid' => UrlValidationErrorType::PortInvalid,
+                'invalid-URL-unit' => UrlValidationErrorType::InvalidUrlUnit,
+                'file-invalid-Windows-drive-letter-host' => UrlValidationErrorType::FileInvalidWindowsDriveLetterHost,
+                'file-invalid-Windows-drive-letter' => UrlValidationErrorType::FileInvalidWindowsDriveLetter,
                 default  => throw new OutOfBoundsException('unknown error type:'.$message),
             },
             LogLevel::WARNING === $level,
         );
     }
 }
+
+/**
+ * case InvalidUrlUnit;
+ * case SpecialSchemeMissingFollowingSolidus;
+ * case MissingSchemeNonRelativeUrl;
+ * case InvalidReverseSoldius;
+ * case InvalidCredentials;
+ * case HostMissing;
+ * case PortOutOfRange;
+ * case PortInvalid;
+ * case FileInvalidWindowsDriveLetter;
+ * case FileInvalidWindowsDriveLetterHost;
+ */
