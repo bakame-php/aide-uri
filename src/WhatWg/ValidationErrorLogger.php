@@ -18,6 +18,8 @@ use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
 
+use function array_filter;
+use function array_values;
 use function is_scalar;
 use function is_string;
 
