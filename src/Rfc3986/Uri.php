@@ -30,16 +30,16 @@ if (PHP_VERSION_ID < 80500) {
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      *
-     * @phpstan-type InputComponentMap array{scheme?: ?string, user?: ?string, pass?: ?string, host?: ?string, port?: ?int, path?: ?string, query?: ?string, fragment?: ?string}
-     * @phpstan-type ComponentMap array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
-     * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
+     * @phpstan-type InputComponentMap array{scheme?: ?string, user?: ?string, pass?: ?string, host?: ?string, port?: ?int, path?: string, query?: ?string, fragment?: ?string}
+     * @phpstan-type ComponentMap array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
+     * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
      */
     final class Uri
     {
         private const TYPE_RAW = 'raw';
         private const TYPE_NORMALIZED = 'normalized';
         /** @var Components */
-        private const DEFAULT_COMPONENTS = ['scheme' => null, 'userInfo' => null, 'user' => null, 'pass' => null, 'host' => null, 'port' => null, 'path' => null, 'query' => null, 'fragment' => null];
+        private const DEFAULT_COMPONENTS = ['scheme' => null, 'userInfo' => null, 'user' => null, 'pass' => null, 'host' => null, 'port' => null, 'path' => '', 'query' => null, 'fragment' => null];
         /** @var Components */
         private readonly array $rawComponents;
         private readonly string $rawUri;
@@ -220,12 +220,12 @@ if (PHP_VERSION_ID < 80500) {
             return $this->withComponent(['user' => $user, 'pass' => $password]);
         }
 
-        public function getRawUser(): ?string
+        public function getRawUsername(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'user');
         }
 
-        public function getUser(): ?string
+        public function getUsername(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'user');
         }
@@ -401,13 +401,13 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{scheme: ?string, user: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
+         * @return array{scheme: ?string, username: ?string, password: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
          */
         public function __debugInfo(): array
         {
             return [
                 'scheme' => $this->rawComponents['scheme'],
-                'user' => $this->rawComponents['user'],
+                'username' => $this->rawComponents['user'],
                 'password' => $this->rawComponents['pass'],
                 'host' => $this->rawComponents['host'],
                 'port' => $this->rawComponents['port'],

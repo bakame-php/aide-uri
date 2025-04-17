@@ -138,8 +138,8 @@ final class UriTest extends TestCase
         self::assertSame('%61pple:p%61ss', $uri->getRawUserInfo());
         self::assertSame('apple:pass', $uri->getUserInfo());
 
-        self::assertSame('%61pple', $uri->getRawUser());
-        self::assertSame('apple', $uri->getUser());
+        self::assertSame('%61pple', $uri->getRawUsername());
+        self::assertSame('apple', $uri->getUsername());
 
         self::assertSame('p%61ss', $uri->getRawPassword());
         self::assertSame('pass', $uri->getPassword());
@@ -226,7 +226,7 @@ final class UriTest extends TestCase
         self::assertNotSame($uri->toRawString(), $uriBis->toRawString());
         self::assertSame([
             'scheme' => 'https',
-            'user' => 'apple',
+            'username' => 'apple',
             'password' => 'pass',
             'host' => 'b%C3%A9b%C3%A9.be',
             'port' => 433,
@@ -278,13 +278,13 @@ final class UriTest extends TestCase
         $uriWithUser = $uri1->withUserInfo('apple');
 
         self::assertSame('apple', $uriWithUser->getUserInfo());
-        self::assertSame('apple', $uriWithUser->getUser());
+        self::assertSame('apple', $uriWithUser->getUsername());
         self::assertNull($uriWithUser->getPassword());
         self::assertNull($uriWithUser->getRawPassword());
 
         $uriWithUserAndPassword = $uriWithUser->withUserInfo('banana:cream');
         self::assertSame('banana:cream', $uriWithUserAndPassword->getUserInfo());
-        self::assertSame('banana', $uriWithUserAndPassword->getUser());
+        self::assertSame('banana', $uriWithUserAndPassword->getUsername());
         self::assertSame('cream', $uriWithUserAndPassword->getRawPassword());
         self::assertSame('cream', $uriWithUserAndPassword->getPassword());
 
