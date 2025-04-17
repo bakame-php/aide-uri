@@ -27,7 +27,7 @@ if (PHP_VERSION_ID < 80500) {
     final class Url
     {
         private WhatWgURL $url;
-        private ValidationErrorLog $logger;
+        private ValidationErrorLogger $logger;
 
         /**
          * @param array<int, UrlValidationError> $errors
@@ -50,10 +50,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __construct(string $uri, ?string $baseUrl = null, array &$softErrors = [])
         {
-            $this->logger = new ValidationErrorLog();
+            $this->logger = new ValidationErrorLogger();
             $options = ['logger' => $this->logger];
 
             try {
+                $this->logger->reset();
                 $this->url = new WhatWgURL($uri, $baseUrl, $options);
             } catch (Exception $exception) {
                 throw new InvalidUrlException(

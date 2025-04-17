@@ -15,31 +15,35 @@ namespace Uri\WhatWg;
 
 use OutOfBoundsException;
 use Psr\Log\AbstractLogger;
+use Psr\Log\LogLevel;
 use Stringable;
 
 use function is_scalar;
 use function is_string;
-use function strtr;
 
 /**
  * @internal
  *
  * This class allows accessing WHATWG errors
  * emitted by \Rowbot\URL\URL and convert them
- * into \Uri\WhatWg\UrlValidationError instances
+ * into an array of \Uri\WhatWg\UrlValidationError instances
  *
  * This class IS NOT PART of the RFC public API
- * but is needed to implement the polyfill.
+ * but is needed to implement the polyfill against
+ * the \Rowbot\URL\URL package
  */
-final class ValidationErrorLog extends AbstractLogger
+final class ValidationErrorLogger extends AbstractLogger
 {
-    /** @var array<int, UrlValidationError> */
-    private array $recoverableErrors = [];
-    /** @var array<int, UrlValidationError> */
+    /** @var list<UrlValidationError> */
     private array $errors = [];
 
+    public function reset(): void
+    {
+        $this->errors = [];
+    }
+
     /**
-     * @return array<int, UrlValidationError>
+     * @return list<UrlValidationError>
      */
     public function errors(): array
     {
@@ -47,17 +51,22 @@ final class ValidationErrorLog extends AbstractLogger
     }
 
     /**
-     * @return array<int, UrlValidationError>
+     * @return list<UrlValidationError>
      */
     public function recoverableErrors(): array
     {
-        return $this->recoverableErrors;
+        return array_values(
+            array_filter(
+                $this->errors,
+                fn (UrlValidationError $error): bool => !$error->failure
+            )
+        );
     }
 
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         $errorContext = $context['input'] ?? null;
-        if ($errorContext instanceof Stringable) {
+        if (is_scalar($errorContext) || $errorContext instanceof Stringable) {
             $errorContext = (string) $errorContext;
         }
 
@@ -65,27 +74,7 @@ final class ValidationErrorLog extends AbstractLogger
             return;
         }
 
-        $validationError = new UrlValidationError(
-            $errorContext,
-            $this->messageMapper($this->interpolate($message, $context)),
-            'warning' === $level
-        );
-
-        $this->errors[] = $validationError;
-        if ('notice' === $level) {
-            $this->recoverableErrors[] = $validationError;
-        }
-    }
-
-    public function reset(): void
-    {
-        $this->recoverableErrors = [];
-        $this->errors = [];
-    }
-
-    private function messageMapper(string $message): UrlValidationErrorType
-    {
-        return match ($message) {
+        $type = match ((string) $message) {
             // recoverable errors
             'special-scheme-missing-following-solidus' => UrlValidationErrorType::SpecialSchemeMissingFollowingSolidus,
             'invalid-URL-unit' => UrlValidationErrorType::InvalidUrlUnit,
@@ -117,20 +106,7 @@ final class ValidationErrorLog extends AbstractLogger
             'port-invalid' => UrlValidationErrorType::PortInvalid,
             default  => throw new OutOfBoundsException('unknown error type:'.$message),
         };
-    }
 
-    /**
-     * @param array<array-key, mixed> $context
-     */
-    private function interpolate(string|Stringable $message, array $context = []): string
-    {
-        $replacements = [];
-        foreach ($context as $key => $val) {
-            if (is_scalar($val) || $val instanceof Stringable) {
-                $replacements['{'.$key.'}'] = $val;
-            }
-        }
-
-        return strtr((string) $message, $replacements);
+        $this->errors[] = new UrlValidationError($errorContext, $type, LogLevel::WARNING === $level);
     }
 }
