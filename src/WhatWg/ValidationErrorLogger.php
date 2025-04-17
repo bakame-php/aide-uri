@@ -112,16 +112,3 @@ final class ValidationErrorLogger extends AbstractLogger
         );
     }
 }
-
-/*
- * case InvalidUrlUnit;
- * case SpecialSchemeMissingFollowingSolidus;
- * case MissingSchemeNonRelativeUrl;
- * case InvalidReverseSoldius;
- * case InvalidCredentials;
- * case HostMissing;
- * case PortOutOfRange;
- * case PortInvalid;
- * case FileInvalidWindowsDriveLetter;
- * case FileInvalidWindowsDriveLetterHost;
- */
