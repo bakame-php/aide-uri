@@ -113,7 +113,7 @@ final class ValidationErrorLogger extends AbstractLogger
     }
 }
 
-/**
+/*
  * case InvalidUrlUnit;
  * case SpecialSchemeMissingFollowingSolidus;
  * case MissingSchemeNonRelativeUrl;
