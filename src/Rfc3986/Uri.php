@@ -279,20 +279,20 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        public function getRawPath(): ?string
+        public function getRawPath(): string
         {
-            return $this->getComponent(self::TYPE_RAW, 'path');
+            return (string) $this->getComponent(self::TYPE_RAW, 'path');
         }
 
-        public function getPath(): ?string
+        public function getPath(): string
         {
-            return $this->getComponent(self::TYPE_NORMALIZED, 'path');
+            return (string) $this->getComponent(self::TYPE_NORMALIZED, 'path');
         }
 
         /**
          * @throws InvalidUriException
          */
-        public function withPath(?string $path): self
+        public function withPath(string $path): self
         {
             return match (true) {
                 $path === $this->getRawPath() => $this,
