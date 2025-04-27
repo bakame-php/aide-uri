@@ -393,8 +393,8 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __unserialize(array $data): void
         {
-            [$data] = $data;
-            $uri = new self($data['uri'] ?? throw new Exception('The `uri` property is missing from the serialized object.'));
+            [$properties] = $data;
+            $uri = new self($properties['uri'] ?? throw new Exception('The `uri` property is missing from the serialized object.'));
 
             $this->rawComponents = $uri->rawComponents;
             $this->rawUri = $uri->rawUri;
