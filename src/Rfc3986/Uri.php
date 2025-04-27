@@ -379,21 +379,22 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{__uri: string}
+         * @return array{0: array{uri: string}, 1: array{}}
          */
         public function __serialize(): array
         {
-            return ['__uri' => $this->toRawString()];
+            return [['uri' => $this->toRawString()], []];
         }
 
         /**
-         * @param array{__uri: string} $data
+         * @param array{0: array{uri: string}, 1: array{}} $data
          *
          * @throws Exception|InvalidUriException
          */
         public function __unserialize(array $data): void
         {
-            $uri = new self($data['__uri'] ?? throw new Exception('The `__uri` property is missing from the serialized object.'));
+            [$data] = $data;
+            $uri = new self($data['uri'] ?? throw new Exception('The `uri` property is missing from the serialized object.'));
 
             $this->rawComponents = $uri->rawComponents;
             $this->rawUri = $uri->rawUri;
