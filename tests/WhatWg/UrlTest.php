@@ -6,7 +6,7 @@ namespace Uri\WhatWg;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TypeError;
+use Uri\UriComparisonMode;
 
 final class UrlTest extends TestCase
 {
@@ -134,7 +134,7 @@ final class UrlTest extends TestCase
 
         $url = new Url("https://example.com#foo");
 
-        self::assertFalse($url->equals(new Url("https://example.com"), false));
+        self::assertFalse($url->equals(new Url("https://example.com"), UriComparisonMode::IncludeFragment));
     }
 
     #[Test]

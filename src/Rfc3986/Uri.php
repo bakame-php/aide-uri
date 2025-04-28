@@ -18,6 +18,7 @@ use League\Uri\Encoder;
 use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
+use Uri\UriComparisonMode;
 
 use function explode;
 
@@ -348,11 +349,11 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws Exception
          */
-        public function equals(self $uri, bool $excludeFragment = true): bool
+        public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
             return match (true) {
                 $this->getFragment() === $uri->getFragment(),
-                ! $excludeFragment => $this->normalizedComponents === $uri->normalizedComponents,
+                UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->normalizedComponents === $uri->normalizedComponents,
                 default => [...$this->normalizedComponents, ...['fragment' => null]] === [...$uri->normalizedComponents, ...['fragment' => null]],
             };
         }

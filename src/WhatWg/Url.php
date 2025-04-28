@@ -18,6 +18,7 @@ use League\Uri\Idna\Converter;
 use League\Uri\UriString;
 use Rowbot\URL\URL as WhatWgURL;
 use SensitiveParameter;
+use Uri\UriComparisonMode;
 
 use function substr;
 
@@ -266,9 +267,9 @@ if (PHP_VERSION_ID < 80500) {
             }
         }
 
-        public function equals(Url $uri, bool $excludeFragment = true): bool
+        public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
-            if ($this->url->hash === $uri->url->hash || ! $excludeFragment) {
+            if ($this->url->hash === $uri->url->hash || UriComparisonMode::IncludeFragment === $uriComparisonMode) {
                 return $this->url->href === $uri->url->href;
             }
 

@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
+use Uri\UriComparisonMode;
 
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
@@ -197,7 +198,7 @@ final class UriTest extends TestCase
         $uri2 = new Uri('http://example.com');
 
         self::assertTrue($uri1->equals($uri2));
-        self::assertFalse($uri1->equals($uri2, false));
+        self::assertFalse($uri1->equals($uri2, UriComparisonMode::IncludeFragment));
     }
 
     #[Test]
