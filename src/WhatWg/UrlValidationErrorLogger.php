@@ -26,15 +26,13 @@ use function is_string;
 /**
  * @internal
  *
- * This class allows accessing WHATWG errors
- * emitted by \Rowbot\URL\URL and convert them
- * into an array of \Uri\WhatWg\UrlValidationError instances
+ * This class allows catching WHATWG errors emitted by \Rowbot\URL\URL
+ * and converts them into \Uri\WhatWg\UrlValidationError instances
  *
- * This class IS NOT PART of the RFC public API
- * but is needed to implement the polyfill against
- * the \Rowbot\URL\URL package
+ * This class IS NOT PART of the RFC public API but is needed to
+ * implement the polyfill against the \Rowbot\URL\URL package
  */
-final class ValidationErrorLogger extends AbstractLogger
+final class UrlValidationErrorLogger extends AbstractLogger
 {
     /** @var list<UrlValidationError> */
     private array $errors = [];
