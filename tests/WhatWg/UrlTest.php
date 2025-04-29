@@ -184,4 +184,18 @@ final class UrlTest extends TestCase
         self::assertSame("https://xn--go8h.com/bar/baz?#fragment", $url->toAsciiString());
         self::assertSame("https://🐘.com/bar/baz?#fragment", $url->toUnicodeString());
     }
+
+    #[Test]
+    public function it_will_not_update_on_invalid_with_input(): void
+    {
+        $url = new Url("https://user:pass@example.com/foo/bar");
+        $urlBis = $url
+            ->withScheme('gopher')
+            ->withUsername('user')
+            ->withPort(12345678)
+            ->withPassword('pass')
+            ->withHost('::1');
+
+        self::assertTrue($urlBis->equals($url));
+    }
 }
