@@ -23,6 +23,12 @@ final class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_will_return_null_on_invalid_url_parsing(): void
+    {
+        self::assertNull(Url::parse("/foo", ".com"));
+    }
+
+    #[Test]
     public function it_will_return_soft_errors_when_uri_is_parsed_with_errors(): void
     {
         $softErrors = [];

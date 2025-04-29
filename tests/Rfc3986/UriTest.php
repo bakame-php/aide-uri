@@ -192,6 +192,12 @@ final class UriTest extends TestCase
     }
 
     #[Test]
+    public function it_will_return_null_on_invalid_uri_parsing(): void
+    {
+        self::assertNull(Uri::parse("/foo", ".com"));
+    }
+
+    #[Test]
     public function it_can_be_check_for_equivalent(): void
     {
         $uri1 = new Uri('http://example.com#foobar');
