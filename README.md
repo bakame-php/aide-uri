@@ -24,7 +24,7 @@ To use the package you are required to use:
 Testing
 -------
 
-`Period` has:
+The URI polyfill has:
 
 - a [PHPUnit](https://phpunit.de) test suite
 - a code analysis compliance test suite using [PHPStan](https://github.com/phpstan/phpstan).
