@@ -134,7 +134,7 @@ final class UrlTest extends TestCase
     #[Test]
     public function it_can_compare_url_for_equivalence(): void
     {
-        $url = new Url("https:////example.COM/");
+        $url = new Url("https:////example.COM/#fragment");
 
         self::assertTrue($url->equals(new Url("https://EXAMPLE.COM")));
 
@@ -174,6 +174,14 @@ final class UrlTest extends TestCase
             'query' => null,
             'fragment' => null,
         ], $url->__debugInfo());
+    }
 
+    #[Test]
+    public function it_will_convert_to_unicode_the_host_in_the_uri_while_preserving_uri_construction(): void
+    {
+        $url = new Url("HTTPS://🐘.com:443/foo/../bar/./baz?#fragment");
+
+        self::assertSame("https://xn--go8h.com/bar/baz?#fragment", $url->toAsciiString());
+        self::assertSame("https://🐘.com/bar/baz?#fragment", $url->toUnicodeString());
     }
 }

@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
+use Uri\WhatWg\Url;
 use function dump;
 
 #[CoversClass(Uri::class)]
@@ -365,5 +366,14 @@ final class UriTest extends TestCase
         self::assertSame('/foo/bar%3Fbaz', $uri->getPath());
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getQuery());
+    }
+
+    #[Test]
+    public function it_will_convert_to_unicode_the_host_in_the_uri_while_preserving_uri_construction(): void
+    {
+        $uri = new Uri("HTTPS://ex%61mple.com:443/foo/../bar/./baz?#fragment");
+
+        self::assertSame("HTTPS://ex%61mple.com:443/foo/../bar/./baz?#fragment", $uri->toRawString());
+        self::assertSame("https://example.com:443/bar/baz?#fragment", $uri->toString());
     }
 }
