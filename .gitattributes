@@ -1,6 +1,5 @@
 * text=auto
 
-/docs              export-ignore
 /.github           export-ignore
 /.editorconfig     export-ignore
 /.gitattributes    export-ignore
@@ -8,11 +7,8 @@
 /.php-cs-fixer.php export-ignore
 /CHANGELOG.md      export-ignore
 /README.md         export-ignore
-/phpbench.jso      export-ignore
+/phpbench.json     export-ignore
 /phpstan.neon      export-ignore
 /phpunit.xml       export-ignore
 /tests             export-ignore
 /benchmarks        export-ignore
-/**/*Test.php      export-ignore
-/**/*TestCase.php  export-ignore
-/**/*Bench.php     export-ignore
