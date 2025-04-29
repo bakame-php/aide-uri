@@ -1,16 +1,17 @@
-# A polyfill for PHP RFC 3986 and WHATWG compliant URI parsing support
+# A polyfill for PHP new native URI parsing feature
 
-This PHP polyfill provides:
+This package provides a PHP polyfill for PHP version greater or equal to **PHP8.1** to the new
+native PHP URI parsing features that are in discussion to be included in **PHP8.5**.
 
-- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parsing 
-- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parsing
+The feature exposes:
 
-For PHP version greater or equal to **PHP8.1**.
+- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser using the `Uri\Rfc3986\Uri` class
+- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parser using the `Uri\WhatWg\Url` class
 
 Documentation
 -------
 
-Full documentation can be found on the [PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support](https://wiki.php.net/rfc/url_parsing_api).
+Full documentation can be found on the [Add RFC 3986 and WHATWG compliant URI parsing support RFC](https://wiki.php.net/rfc/url_parsing_api).
 
 System Requirements
 -------
@@ -29,11 +30,18 @@ The URI polyfill has:
 - a [PHPUnit](https://phpunit.de) test suite
 - a code analysis compliance test suite using [PHPStan](https://github.com/phpstan/phpstan).
 - a coding style compliance test suite using [PHP CS Fixer](http://cs.sensiolabs.org/).
+- a benchmark using [PHP Bench](https://github.com/phpbench/phpbench).
 
-To run the tests, run the following command from the project folder.
+To run the tests, run the following command from the project folder .
 
 ``` bash
 $ composer test
+```
+
+You can run the benchmark separately using the following command:
+
+``` bash
+$ composer benchmark
 ```
 
 Contributing
