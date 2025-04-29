@@ -26,13 +26,11 @@ use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80500) {
     /**
-     * This is a user-land polyfill to the native Uri\Rfc3986\Rfc3986\Uri class proposed
+     * This is a user-land polyfill to the native Uri\Rfc3986\Uri class proposed
      * in the PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      *
-     * @phpstan-type InputComponentMap array{scheme?: ?string, user?: ?string, pass?: ?string, host?: ?string, port?: ?int, path?: string, query?: ?string, fragment?: ?string}
-     * @phpstan-type ComponentMap array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
      * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
      */
     final class Uri
@@ -90,7 +88,7 @@ if (PHP_VERSION_ID < 80500) {
          *
          * @link https://tools.ietf.org/html/rfc3986
          *
-         * @param ComponentMap $parts The URI components
+         * @param array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string} $parts The URI components
          *
          * @return Components
          */
@@ -154,7 +152,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param InputComponentMap $components
+         * @param array{scheme?: ?string, user?: ?string, pass?: ?string, host?: ?string, port?: ?int, path?: string, query?: ?string, fragment?: ?string} $components
          *
          * @throws InvalidUriException
          */
