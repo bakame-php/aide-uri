@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
+use function dump;
 
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
@@ -244,6 +245,15 @@ final class UriTest extends TestCase
     }
 
     #[Test]
+    public function it_can_normalize_uri(): void
+    {
+        $uri = new Uri("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc");
+
+        self::assertSame("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc", $uri->toRawString());
+        self::assertSame("https://apple:pass@example.com:433/foobar?abc=abc#abc", $uri->toString());
+    }
+
+    #[Test]
     public function it_will_use_the_punycode_form_on_host_normalization(): void
     {
         $uri = new Uri("https://www.b%C3%A9b%C3%A9.be#foobar");
@@ -342,5 +352,18 @@ final class UriTest extends TestCase
         $this->expectException(InvalidUriException::class);
 
         new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo[]=1&foo[]=2");
+    }
+
+    #[Test]
+    public function it_handles_differently_raw_and_normalized_components(): void
+    {
+        $uri = new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/foo/bar%3Fbaz?foo=bar%26baz%3Dqux");
+
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getRawHost());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getHost());
+        self::assertSame('/foo/bar%3Fbaz', $uri->getRawPath());
+        self::assertSame('/foo/bar%3Fbaz', $uri->getPath());
+        self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
+        self::assertSame('foo=bar%26baz%3Dqux', $uri->getQuery());
     }
 }
