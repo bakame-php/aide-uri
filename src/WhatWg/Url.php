@@ -88,6 +88,11 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withScheme(string $scheme): self
         {
+            $scheme = strtolower($scheme);
+            if ($scheme === $this->getScheme() || $scheme === $this->url->protocol) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->protocol = $scheme;
 
@@ -101,6 +106,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withUsername(?string $user): self
         {
+            if ($user === $this->getUsername() || $user === $this->url->username) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->username = (string) $user;
 
@@ -114,6 +123,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withPassword(#[SensitiveParameter] ?string $password): self
         {
+            if ($password === $this->getPassword() || $password === $this->url->password) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->password = (string) $password;
 
@@ -142,6 +155,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withHost(string $host): self
         {
+            if ($host === $this->getAsciiHost() || $host === $this->getUnicodeHost()) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->hostname = $host;
 
@@ -155,6 +172,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withPort(?int $port): self
         {
+            if ($port === $this->getPort()) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->port = (string) $port;
 
@@ -168,6 +189,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withPath(string $path): self
         {
+            if ($path === $this->url->pathname) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->pathname = $path;
 
@@ -186,6 +211,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withQuery(?string $query): self
         {
+            if ($query === $this->url->search || $query === $this->getQuery()) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->search = (string) $query;
 
@@ -204,6 +233,10 @@ if (PHP_VERSION_ID < 80500) {
 
         public function withFragment(?string $fragment): self
         {
+            if ($fragment === $this->url->hash || $fragment === $this->getFragment()) {
+                return $this;
+            }
+
             $copy = $this->copy();
             $copy->url->hash = (string) $fragment;
 

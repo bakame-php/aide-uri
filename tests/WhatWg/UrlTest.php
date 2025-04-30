@@ -50,7 +50,7 @@ final class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_can_retrive_url_components(): void
+    public function it_can_retrieve_url_components(): void
     {
         $url = new Url("HTTPS://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc");
 
@@ -191,9 +191,7 @@ final class UrlTest extends TestCase
         $url = new Url("https://user:pass@example.com/foo/bar");
         $urlBis = $url
             ->withScheme('gopher')
-            ->withUsername('user')
             ->withPort(12345678)
-            ->withPassword('pass')
             ->withHost('::1');
 
         self::assertTrue($urlBis->equals($url));
@@ -212,5 +210,23 @@ final class UrlTest extends TestCase
         self::assertNull($url->getQuery());
         self::assertSame("file:///c:/Users/JohnDoe/Documents/report.txt", $url->toUnicodeString());
         self::assertSame($url->toUnicodeString(), $url->toAsciiString());
+    }
+
+    #[Test]
+    public function it_return_the_same_instance_if_nothing_is_changed(): void
+    {
+        $url = new Url("https://apple:pass@example.com:433/foobar?abc=abc#abc");
+        $urlBis = $url
+            ->withScheme('https:')
+            ->withUsername('apple')
+            ->withPassword('pass')
+            ->withHost('example.com')
+            ->withPort(433)
+            ->withPath('/foobar')
+            ->withQuery('?abc=abc')
+            ->withFragment('#abc');
+
+        self::assertTrue($urlBis->equals($url));
+        self::assertSame($urlBis, $url);
     }
 }

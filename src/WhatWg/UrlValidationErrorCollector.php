@@ -81,14 +81,16 @@ final class UrlValidationErrorCollector extends AbstractLogger
 
         $this->errors[] = new UrlValidationError(
             $errorContext,
+            // \Rowbot\URL\URL makes no usage of string interpolation
+            // the message is a string representing one of
+            // the defined \Uri\WhatWg\UrlValidationErrorType case
+            // mapping is done using https://url.spec.whatwg.org/#writing
             match ((string) $message) {
-                'missing-scheme-non-relative-URL' => UrlValidationErrorType::MissingSchemeNonRelativeUrl,
-                'special-scheme-missing-following-solidus' => UrlValidationErrorType::SpecialSchemeMissingFollowingSolidus,
-                'invalid-credentials' => UrlValidationErrorType::InvalidCredentials,
-                'invalid-reverse-solidus' => UrlValidationErrorType::InvalidReverseSoldius,
+                // IDNA Error Tyoe
                 'domain-to-ASCII' => UrlValidationErrorType::DomainToAscii,
                 'domain-to-unicode' => UrlValidationErrorType::DomainToUnicode,
                 'domain-invalid-code-point' => UrlValidationErrorType::DomainInvalidCodePoint,
+                // Host parsing
                 'host-invalid-code-point' => UrlValidationErrorType::HostInvalidCodePoint,
                 'IPv4-part-empty' => UrlValidationErrorType::Ipv4EmptyPart,
                 'IPv4-non-decimal-part' => UrlValidationErrorType::Ipv4NonDecimalPart,
@@ -105,14 +107,21 @@ final class UrlValidationErrorCollector extends AbstractLogger
                 'IPv4-in-IPv6-too-few-parts' => UrlValidationErrorType::Ipv4InIpv6TooFewParts,
                 'IPv4-in-IPv6-invalid-code-point' => UrlValidationErrorType::Ipv4InIpv6InvalidCodePoint,
                 'IPv4-in-IPv6-too-many-pieces' => UrlValidationErrorType::Ipv4InIpv6TooManyPieces,
+                // URL parsing
+                'invalid-URL-unit' => UrlValidationErrorType::InvalidUrlUnit,
+                'special-scheme-missing-following-solidus' => UrlValidationErrorType::SpecialSchemeMissingFollowingSolidus,
+                'missing-scheme-non-relative-URL' => UrlValidationErrorType::MissingSchemeNonRelativeUrl,
+                'invalid-credentials' => UrlValidationErrorType::InvalidCredentials,
+                'invalid-reverse-solidus' => UrlValidationErrorType::InvalidReverseSoldius,
                 'host-missing' => UrlValidationErrorType::HostMissing,
                 'port-out-of-range' => UrlValidationErrorType::PortOutOfRange,
                 'port-invalid' => UrlValidationErrorType::PortInvalid,
-                'invalid-URL-unit' => UrlValidationErrorType::InvalidUrlUnit,
                 'file-invalid-Windows-drive-letter-host' => UrlValidationErrorType::FileInvalidWindowsDriveLetterHost,
                 'file-invalid-Windows-drive-letter' => UrlValidationErrorType::FileInvalidWindowsDriveLetter,
                 default  => throw new OutOfBoundsException('unknown error type:'.$message),
             },
+            // \Rowbot\URL\URL emits LogLevel::WARNING when the error is a failure
+            // otherwise LogLevel::NOTICE is used
             LogLevel::WARNING === $level,
         );
     }
