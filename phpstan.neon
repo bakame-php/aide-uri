@@ -6,7 +6,6 @@ includes:
 parameters:
     ignoreErrors:
         - '#Comparison operation "<" between int<80100, 80499> and 80500 is always true.#'
-        - '#Dead catch - Exception is never thrown in the try block.#'
     level: max
     paths:
         - src

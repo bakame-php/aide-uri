@@ -16,6 +16,7 @@ namespace Uri\WhatWg;
 use Exception;
 use League\Uri\Idna\Converter;
 use League\Uri\UriString;
+use ReflectionClass;
 use Rowbot\URL\URL as WhatWgURL;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
@@ -34,7 +35,6 @@ if (PHP_VERSION_ID < 80500) {
     final class Url
     {
         private WhatWgURL $url;
-        private UrlValidationErrorLogger $logger;
         private ?string $urlUnicodeString = null;
 
         /**
@@ -58,26 +58,24 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __construct(string $uri, ?string $baseUrl = null, array &$softErrors = [])
         {
-            $this->logger = new UrlValidationErrorLogger();
-            $options = ['logger' => $this->logger];
+            $collector = new UrlValidationErrorCollector();
 
             try {
-                $this->logger->reset();
-                $this->url = new WhatWgURL($uri, $baseUrl, $options);
+                $this->url = new WhatWgURL($uri, $baseUrl, ['logger' => $collector]);
             } catch (Exception $exception) {
                 throw new InvalidUrlException(
                     message: $exception->getMessage(),
-                    errors: $this->logger->errors(),
+                    errors: $collector->errors(),
                     previous: $exception
                 );
             } finally {
-                $softErrors = $this->logger->recoverableErrors();
+                $softErrors = $collector->recoverableErrors();
             }
         }
 
         private function copy(): self
         {
-            $newInstance = new self('a://b');
+            $newInstance = (new ReflectionClass(self::class))->newInstanceWithoutConstructor();
             $newInstance->url = clone $this->url;
 
             return $newInstance;
@@ -85,12 +83,7 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getScheme(): string
         {
-            $scheme = $this->url->protocol;
-            if ('' !== $scheme) {
-                return substr($scheme, 0, -1);
-            }
-
-            return '';
+            return substr($this->url->protocol, 0, -1);
         }
 
         /**
@@ -99,13 +92,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withScheme(string $scheme): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->protocol = $scheme;
+            $copy->url->protocol = $scheme;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getUsername(): ?string
@@ -119,13 +108,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withUsername(?string $user): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->username = (string) $user;
+            $copy->url->username = (string) $user;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getPassword(): ?string
@@ -139,13 +124,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withPassword(#[SensitiveParameter] ?string $password): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->password = (string) $password;
+            $copy->url->password = (string) $password;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getAsciiHost(): ?string
@@ -174,13 +155,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withHost(string $host): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->hostname = $host;
+            $copy->url->hostname = $host;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getPort(): ?int
@@ -194,13 +171,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withPort(?int $port): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->port = (string) $port;
+            $copy->url->port = (string) $port;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getPath(): string
@@ -214,13 +187,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withPath(string $path): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->pathname = $path;
+            $copy->url->pathname = $path;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getQuery(): ?string
@@ -239,13 +208,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withQuery(?string $query): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->search = (string) $query;
+            $copy->url->search = (string) $query;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function getFragment(): ?string
@@ -264,13 +229,9 @@ if (PHP_VERSION_ID < 80500) {
         public function withFragment(?string $fragment): self
         {
             $copy = $this->copy();
-            try {
-                $copy->url->hash = (string) $fragment;
+            $copy->url->hash = (string) $fragment;
 
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException($exception->getMessage(), errors: $copy->logger->errors(), previous: $exception);
-            }
+            return $copy;
         }
 
         public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool

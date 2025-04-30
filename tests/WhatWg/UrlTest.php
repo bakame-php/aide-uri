@@ -198,4 +198,19 @@ final class UrlTest extends TestCase
 
         self::assertTrue($urlBis->equals($url));
     }
+
+    #[Test]
+    public function it_will_handle_window_uri(): void
+    {
+        $url = new Url("FiLE:///c:/Users/JohnDoe/Documents/report.txt");
+
+        self::assertSame('file', $url->getScheme());
+        self::assertNull($url->getUnicodeHost());
+        self::assertNull($url->getAsciiHost());
+        self::assertNull($url->getPort());
+        self::assertNull($url->getFragment());
+        self::assertNull($url->getQuery());
+        self::assertSame("file:///c:/Users/JohnDoe/Documents/report.txt", $url->toUnicodeString());
+        self::assertSame($url->toUnicodeString(), $url->toAsciiString());
+    }
 }
