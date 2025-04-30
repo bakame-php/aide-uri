@@ -79,7 +79,6 @@ if (PHP_VERSION_ID < 80500) {
         {
             $newInstance = new self('a://b');
             $newInstance->url = clone $this->url;
-            $newInstance->logger->reset();
 
             return $newInstance;
         }
@@ -158,7 +157,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             $host = $this->getAsciiHost();
             if ('' === $host || null === $host) {
-                return null;
+                return $host;
             }
 
             $idn = Converter::toUnicode($host);
@@ -295,14 +294,16 @@ if (PHP_VERSION_ID < 80500) {
 
         public function toUnicodeString(): string
         {
-            // We use UriString::parse and UriString::build
-            // to preserve the empty and null components.
-            // The URI is already parsed as a WHATWG URL
-            // so the RFC3986/87 parsing doesn't affect
-            // the WHATWG URL output.
-            $this->urlUnicodeString ??= UriString::build([
+            if (null !== $this->urlUnicodeString) {
+                return $this->urlUnicodeString;
+            }
+
+            $unicodeHost = $this->getUnicodeHost();
+            $this->urlUnicodeString = $this->getAsciiHost() === $unicodeHost
+                ? $this->url->href
+                : UriString::build([
                 ...UriString::parse($this->url->href),
-                ...['host' => $this->getUnicodeHost()],
+                ...['host' => $unicodeHost],
             ]);
 
             return $this->urlUnicodeString;
