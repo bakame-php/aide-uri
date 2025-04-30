@@ -86,9 +86,6 @@ if (PHP_VERSION_ID < 80500) {
             return substr($this->url->protocol, 0, -1);
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withScheme(string $scheme): self
         {
             $copy = $this->copy();
@@ -102,9 +99,6 @@ if (PHP_VERSION_ID < 80500) {
             return '' === $this->url->username ? null : $this->url->username;
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withUsername(?string $user): self
         {
             $copy = $this->copy();
@@ -118,9 +112,6 @@ if (PHP_VERSION_ID < 80500) {
             return  '' === $this->url->password ? null : $this->url->password;
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withPassword(#[SensitiveParameter] ?string $password): self
         {
             $copy = $this->copy();
@@ -149,9 +140,6 @@ if (PHP_VERSION_ID < 80500) {
             return $idn->domain();
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withHost(string $host): self
         {
             $copy = $this->copy();
@@ -165,9 +153,6 @@ if (PHP_VERSION_ID < 80500) {
             return '' === $this->url->port ? null : (int) $this->url->port;
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withPort(?int $port): self
         {
             $copy = $this->copy();
@@ -181,9 +166,6 @@ if (PHP_VERSION_ID < 80500) {
             return $this->url->pathname;
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withPath(string $path): self
         {
             $copy = $this->copy();
@@ -202,9 +184,6 @@ if (PHP_VERSION_ID < 80500) {
             return null;
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withQuery(?string $query): self
         {
             $copy = $this->copy();
@@ -223,9 +202,6 @@ if (PHP_VERSION_ID < 80500) {
             return null;
         }
 
-        /**
-         * @throws InvalidUrlException
-         */
         public function withFragment(?string $fragment): self
         {
             $copy = $this->copy();
