@@ -50,13 +50,13 @@ The URI polyfill has:
 To run the tests, run the following command from the project folder .
 
 ``` bash
-$ composer test
+composer test
 ```
 
 You can run the benchmark separately using the following command:
 
 ``` bash
-$ composer benchmark
+composer benchmark
 ```
 
 ## Contributing
