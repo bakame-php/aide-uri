@@ -29,7 +29,7 @@ System Requirements
 To use the package you are required to use:
 
 - **PHP >= 8.1** but the latest stable version of PHP is recommended
-- [League URI Interface Package](https://github.com/thephpleague/uri-interfaces) and its dependencies
+- [League URI Interfaces](https://github.com/thephpleague/uri-interfaces) and its dependencies
 - [URL-Parser](https://github.com/TRowbotham/URL-Parser) and its dependencies
 
 Testing

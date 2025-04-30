@@ -1,5 +1,5 @@
 {
-    "name": "bakame-php/aide-uri",
+    "name": "bakame/aide-uri",
     "description": "URI polyfill for PHP native RFC3986/WHATWG URI classes",
     "keywords": ["uri", "url", "rfc3986", "whatwg", "polyfill", "parser", "resolver", "equivalence", "compatibiliy", "portable"],
     "license": "MIT",
