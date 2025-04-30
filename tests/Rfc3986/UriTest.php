@@ -20,11 +20,10 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
-use Uri\WhatWg\Url;
-use function dump;
 
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
+#[CoversClass(UriComparisonMode::class)]
 final class UriTest extends TestCase
 {
     #[Test]
