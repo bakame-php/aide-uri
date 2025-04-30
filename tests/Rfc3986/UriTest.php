@@ -32,8 +32,8 @@ final class UriTest extends TestCase
         $uri = Uri::parse('http://example.com');
 
         self::assertInstanceOf(Uri::class, $uri);
-        self::assertSame('http://example.com', $uri->toRawString());
         self::assertSame('http://example.com', $uri->toString());
+        self::assertSame('http://example.com', $uri->toNormalizedString());
     }
 
     #[Test]
@@ -43,7 +43,7 @@ final class UriTest extends TestCase
         $uri = $reflection->newInstanceWithoutConstructor();
 
         $this->expectException(Error::class);
-        $uri->toRawString();
+        $uri->toString();
     }
 
     #[Test]
@@ -119,14 +119,14 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo=bar%26baz%3Dqux");
 
-        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getRawHost());
-        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getHost());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getHost());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getNormalizedHost());
 
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getQuery());
-        self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
+        self::assertSame('foo=bar%26baz%3Dqux', $uri->getNormalizedQuery());
 
-        self::assertSame('/', $uri->getRawPath());
-        self::assertSame('', $uri->getPath());
+        self::assertSame('/', $uri->getPath());
+        self::assertSame('', $uri->getNormalizedPath());
     }
 
     #[Test]
@@ -134,34 +134,34 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc");
 
-        self::assertSame('https', $uri->getRawScheme());
         self::assertSame('https', $uri->getScheme());
+        self::assertSame('https', $uri->getNormalizedScheme());
 
-        self::assertSame('%61pple:p%61ss', $uri->getRawUserInfo());
-        self::assertSame('apple:pass', $uri->getUserInfo());
+        self::assertSame('%61pple:p%61ss', $uri->getUserInfo());
+        self::assertSame('apple:pass', $uri->getNormalizedUserInfo());
 
-        self::assertSame('%61pple', $uri->getRawUsername());
-        self::assertSame('apple', $uri->getUsername());
+        self::assertSame('%61pple', $uri->getUsername());
+        self::assertSame('apple', $uri->getNormalizedUsername());
 
-        self::assertSame('p%61ss', $uri->getRawPassword());
-        self::assertSame('pass', $uri->getPassword());
+        self::assertSame('p%61ss', $uri->getPassword());
+        self::assertSame('pass', $uri->getNormalizedPassword());
 
-        self::assertSame('b%C3%A9b%C3%A9.be', $uri->getRawHost());
         self::assertSame('b%C3%A9b%C3%A9.be', $uri->getHost());
+        self::assertSame('b%C3%A9b%C3%A9.be', $uri->getNormalizedHost());
 
         self::assertSame(433, $uri->getPort());
 
-        self::assertSame('/foob%61r', $uri->getRawPath());
-        self::assertSame('/foobar', $uri->getPath());
+        self::assertSame('/foob%61r', $uri->getPath());
+        self::assertSame('/foobar', $uri->getNormalizedPath());
 
-        self::assertSame('%61bc=%61bc', $uri->getRawQuery());
-        self::assertSame('abc=abc', $uri->getQuery());
+        self::assertSame('%61bc=%61bc', $uri->getQuery());
+        self::assertSame('abc=abc', $uri->getNormalizedQuery());
 
-        self::assertSame('%61bc', $uri->getRawFragment());
-        self::assertSame('abc', $uri->getFragment());
+        self::assertSame('%61bc', $uri->getFragment());
+        self::assertSame('abc', $uri->getNormalizedFragment());
 
-        self::assertSame("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc", $uri->toRawString());
-        self::assertSame("https://apple:pass@b%C3%A9b%C3%A9.be:433/foobar?abc=abc#abc", $uri->toString());
+        self::assertSame("https://%61pple:p%61ss@b%C3%A9b%C3%A9.be:433/foob%61r?%61bc=%61bc#%61bc", $uri->toString());
+        self::assertSame("https://apple:pass@b%C3%A9b%C3%A9.be:433/foobar?abc=abc#abc", $uri->toNormalizedString());
     }
 
     #[Test]
@@ -169,17 +169,17 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("HTTPS://EXAMPLE.COM/foo/../bar/");
 
-        self::assertSame('HTTPS', $uri->getRawScheme());
-        self::assertSame('https', $uri->getScheme());
+        self::assertSame('HTTPS', $uri->getScheme());
+        self::assertSame('https', $uri->getNormalizedScheme());
 
-        self::assertSame('EXAMPLE.COM', $uri->getRawHost());
-        self::assertSame('example.com', $uri->getHost());
+        self::assertSame('EXAMPLE.COM', $uri->getHost());
+        self::assertSame('example.com', $uri->getNormalizedHost());
 
-        self::assertSame('/foo/../bar/', $uri->getRawPath());
-        self::assertSame('/bar/', $uri->getPath());
+        self::assertSame('/foo/../bar/', $uri->getPath());
+        self::assertSame('/bar/', $uri->getNormalizedPath());
 
-        self::assertSame("HTTPS://EXAMPLE.COM/foo/../bar/", $uri->toRawString());
-        self::assertSame("https://example.com/bar/", $uri->toString());
+        self::assertSame("HTTPS://EXAMPLE.COM/foo/../bar/", $uri->toString());
+        self::assertSame("https://example.com/bar/", $uri->toNormalizedString());
     }
 
     #[Test]
@@ -188,7 +188,7 @@ final class UriTest extends TestCase
         $uri = new Uri("HTTPS://EXAMPLE.COM/foo/../bar/");
         $uriB = unserialize(serialize($uri));
 
-        self::assertSame($uri->toRawString(), $uriB->toRawString());
+        self::assertSame($uri->toString(), $uriB->toString());
         self::assertTrue($uriB->equals($uri));
     }
 
@@ -213,7 +213,7 @@ final class UriTest extends TestCase
     {
         self::assertSame(
             "https://example.com/foo",
-            (new Uri("https://example.com"))->resolve("/foo")->toString()
+            (new Uri("https://example.com"))->resolve("/foo")->toNormalizedString()
         );
     }
 
@@ -231,7 +231,7 @@ final class UriTest extends TestCase
             ->withFragment('abc');
 
         self::assertTrue($uriBis->equals($uri));
-        self::assertNotSame($uri->toRawString(), $uriBis->toRawString());
+        self::assertNotSame($uri->toString(), $uriBis->toString());
         self::assertSame([
             'scheme' => 'https',
             'username' => 'apple',
@@ -249,8 +249,8 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc");
 
-        self::assertSame("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc", $uri->toRawString());
-        self::assertSame("https://apple:pass@example.com:433/foobar?abc=abc#abc", $uri->toString());
+        self::assertSame("https://%61pple:p%61ss@ex%61mple.com:433/foob%61r?%61bc=%61bc#%61bc", $uri->toString());
+        self::assertSame("https://apple:pass@example.com:433/foobar?abc=abc#abc", $uri->toNormalizedString());
     }
 
     #[Test]
@@ -258,8 +258,8 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://www.b%C3%A9b%C3%A9.be#foobar");
 
-        self::assertSame('www.b%C3%A9b%C3%A9.be', $uri->getRawHost());
         self::assertSame('www.b%C3%A9b%C3%A9.be', $uri->getHost());
+        self::assertSame('www.b%C3%A9b%C3%A9.be', $uri->getNormalizedHost());
     }
 
     #[Test]
@@ -275,7 +275,7 @@ final class UriTest extends TestCase
     {
         $this->expectException(InvalidUriException::class);
 
-        (new Uri(""))->withPath(':/')->toString();
+        (new Uri(""))->withPath(':/')->toNormalizedString();
     }
 
     #[Test]
@@ -284,8 +284,8 @@ final class UriTest extends TestCase
         $uri = new Uri("https://www.b%C3%A9b%C3%A9.be#foobar");
         $newUri = $uri->withScheme('FoO');
 
-        self::assertSame('FoO', $newUri->getRawScheme());
-        self::assertSame('foo', $newUri->getScheme());
+        self::assertSame('FoO', $newUri->getScheme());
+        self::assertSame('foo', $newUri->getNormalizedScheme());
     }
 
     #[Test]
@@ -294,16 +294,16 @@ final class UriTest extends TestCase
         $uri1 = new Uri('http://example.com#foobar');
         $uriWithUser = $uri1->withUserInfo('apple');
 
-        self::assertSame('apple', $uriWithUser->getUserInfo());
-        self::assertSame('apple', $uriWithUser->getUsername());
+        self::assertSame('apple', $uriWithUser->getNormalizedUserInfo());
+        self::assertSame('apple', $uriWithUser->getNormalizedUsername());
+        self::assertNull($uriWithUser->getNormalizedPassword());
         self::assertNull($uriWithUser->getPassword());
-        self::assertNull($uriWithUser->getRawPassword());
 
         $uriWithUserAndPassword = $uriWithUser->withUserInfo('banana:cream');
-        self::assertSame('banana:cream', $uriWithUserAndPassword->getUserInfo());
-        self::assertSame('banana', $uriWithUserAndPassword->getUsername());
-        self::assertSame('cream', $uriWithUserAndPassword->getRawPassword());
+        self::assertSame('banana:cream', $uriWithUserAndPassword->getNormalizedUserInfo());
+        self::assertSame('banana', $uriWithUserAndPassword->getNormalizedUsername());
         self::assertSame('cream', $uriWithUserAndPassword->getPassword());
+        self::assertSame('cream', $uriWithUserAndPassword->getNormalizedPassword());
 
         $uriStripped = $uriWithUserAndPassword->withUserInfo(null);
         self::assertTrue($uriStripped->equals($uri1));
@@ -317,7 +317,7 @@ final class UriTest extends TestCase
 
         self::assertSame(
             "https://[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]?foo=bar%26baz%3Dqux",
-            $uri->toString()
+            $uri->toNormalizedString()
         );
     }
 
@@ -342,7 +342,7 @@ final class UriTest extends TestCase
     {
         self::assertSame(
             'https:example.com',
-            (new Uri("example.com"))->withScheme('https')->toString()
+            (new Uri("example.com"))->withScheme('https')->toNormalizedString()
         );
     }
 
@@ -359,12 +359,12 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/foo/bar%3Fbaz?foo=bar%26baz%3Dqux");
 
-        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getRawHost());
-        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getHost());
-        self::assertSame('/foo/bar%3Fbaz', $uri->getRawPath());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]', $uri->getHost());
+        self::assertSame('[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]', $uri->getNormalizedHost());
         self::assertSame('/foo/bar%3Fbaz', $uri->getPath());
-        self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
+        self::assertSame('/foo/bar%3Fbaz', $uri->getNormalizedPath());
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getQuery());
+        self::assertSame('foo=bar%26baz%3Dqux', $uri->getNormalizedQuery());
     }
 
     #[Test]
@@ -372,7 +372,7 @@ final class UriTest extends TestCase
     {
         $uri = new Uri("HTTPS://ex%61mple.com:443/foo/../bar/./baz?#fragment");
 
-        self::assertSame("HTTPS://ex%61mple.com:443/foo/../bar/./baz?#fragment", $uri->toRawString());
-        self::assertSame("https://example.com:443/bar/baz?#fragment", $uri->toString());
+        self::assertSame("HTTPS://ex%61mple.com:443/foo/../bar/./baz?#fragment", $uri->toString());
+        self::assertSame("https://example.com:443/bar/baz?#fragment", $uri->toNormalizedString());
     }
 }

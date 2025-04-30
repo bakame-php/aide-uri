@@ -2,8 +2,8 @@
 
 ````php
 $uri = new Uri\Rfc3986\Uri("HTTPS://ex%61mpLE.com:443/foo/../bar/./baz?#fragment");
-$uri->toRawString(); // returns "HTTPS://ex%61mpLE.com:443/foo/../bar/./baz?#fragment"
-$uri->toString();    // returns "https://example.com:443/bar/baz?#fragment"
+$uri->toString(); // returns "HTTPS://ex%61mpLE.com:443/foo/../bar/./baz?#fragment"
+$uri->toNormalizedString();    // returns "https://example.com:443/bar/baz?#fragment"
 
 $url = new Uri\WhatWg\Url("HTTPS://🐘.com:443/foo/../bar/./baz?#fragment");
 echo $url->toAsciiString();   // returns "https://xn--go8h.com/bar/baz?#fragment"

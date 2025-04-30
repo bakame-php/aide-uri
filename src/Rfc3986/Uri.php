@@ -167,12 +167,12 @@ if (PHP_VERSION_ID < 80500) {
             return new self($uri);
         }
 
-        public function getScheme(): ?string
+        public function getNormalizedScheme(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'scheme');
         }
 
-        public function getRawScheme(): ?string
+        public function getScheme(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'scheme');
         }
@@ -183,18 +183,18 @@ if (PHP_VERSION_ID < 80500) {
         public function withScheme(?string $scheme): self
         {
             return match (true) {
-                $scheme === $this->getRawScheme() => $this,
+                $scheme === $this->getScheme() => $this,
                 UriString::isScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
                 default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
             };
         }
 
-        public function getUserInfo(): ?string
+        public function getNormalizedUserInfo(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'userInfo');
         }
 
-        public function getRawUserInfo(): ?string
+        public function getUserInfo(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'userInfo');
         }
@@ -204,7 +204,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withUserInfo(#[SensitiveParameter] ?string $userInfo): self
         {
-            if ($this->getRawUserInfo() === $userInfo) {
+            if ($this->getUserInfo() === $userInfo) {
                 return $this;
             }
 
@@ -219,32 +219,32 @@ if (PHP_VERSION_ID < 80500) {
             return $this->withComponent(['user' => $user, 'pass' => $password]);
         }
 
-        public function getRawUsername(): ?string
+        public function getUsername(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'user');
         }
 
-        public function getUsername(): ?string
+        public function getNormalizedUsername(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'user');
         }
 
-        public function getRawPassword(): ?string
+        public function getPassword(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'pass');
         }
 
-        public function getPassword(): ?string
+        public function getNormalizedPassword(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'pass');
         }
 
-        public function getRawHost(): ?string
+        public function getHost(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'host');
         }
 
-        public function getHost(): ?string
+        public function getNormalizedHost(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'host');
         }
@@ -255,7 +255,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withHost(?string $host): self
         {
             return match (true) {
-                $host === $this->getRawHost() => $this,
+                $host === $this->getHost() => $this,
                 UriString::isHost($host) => $this->withComponent(['host' => $host]),
                 default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
             };
@@ -278,12 +278,12 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        public function getRawPath(): string
+        public function getPath(): string
         {
             return (string) $this->getComponent(self::TYPE_RAW, 'path');
         }
 
-        public function getPath(): string
+        public function getNormalizedPath(): string
         {
             return (string) $this->getComponent(self::TYPE_NORMALIZED, 'path');
         }
@@ -294,18 +294,18 @@ if (PHP_VERSION_ID < 80500) {
         public function withPath(string $path): self
         {
             return match (true) {
-                $path === $this->getRawPath() => $this,
+                $path === $this->getPath() => $this,
                 Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
                 default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
             };
         }
 
-        public function getRawQuery(): ?string
+        public function getQuery(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'query');
         }
 
-        public function getQuery(): ?string
+        public function getNormalizedQuery(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'query');
         }
@@ -316,18 +316,18 @@ if (PHP_VERSION_ID < 80500) {
         public function withQuery(?string $query): self
         {
             return match (true) {
-                $query === $this->getRawQuery() => $this,
+                $query === $this->getQuery() => $this,
                 Encoder::isQueryEncoded($query) => $this->withComponent(['query' => $query]),
                 default => throw new InvalidUriException('The encoded query string component `'.$query.'` contains invalid characters.'),
             };
         }
 
-        public function getRawFragment(): ?string
+        public function getFragment(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'fragment');
         }
 
-        public function getFragment(): ?string
+        public function getNormalizedFragment(): ?string
         {
             return $this->getComponent(self::TYPE_NORMALIZED, 'fragment');
         }
@@ -338,7 +338,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withFragment(?string $fragment): self
         {
             return match (true) {
-                $fragment === $this->getRawFragment() => $this,
+                $fragment === $this->getFragment() => $this,
                 Encoder::isFragmentEncoded($fragment) => $this->withComponent(['fragment' => $fragment]),
                 default => throw new InvalidUriException('The encoded fragment string component `'.$fragment.'` contains invalid characters.'),
             };
@@ -350,18 +350,18 @@ if (PHP_VERSION_ID < 80500) {
         public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
             return match (true) {
-                $this->getFragment() === $uri->getFragment(),
+                $this->getNormalizedFragment() === $uri->getNormalizedFragment(),
                 UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->normalizedComponents === $uri->normalizedComponents,
                 default => [...$this->normalizedComponents, ...['fragment' => null]] === [...$uri->normalizedComponents, ...['fragment' => null]],
             };
         }
 
-        public function toRawString(): string
+        public function toString(): string
         {
             return $this->rawUri;
         }
 
-        public function toString(): string
+        public function toNormalizedString(): string
         {
             $this->setNormalizedComponents();
             $this->normalizedUri ??= UriString::build($this->normalizedComponents);
@@ -374,7 +374,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function resolve(string $uri): self
         {
-            return new self($uri, $this->toRawString());
+            return new self($uri, $this->toString());
         }
 
         /**
@@ -382,7 +382,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __serialize(): array
         {
-            return [['uri' => $this->toRawString()], []];
+            return [['uri' => $this->toString()], []];
         }
 
         /**
