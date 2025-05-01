@@ -233,4 +233,17 @@ final class UrlTest extends TestCase
         self::assertTrue($urlBis->equals($url));
         self::assertSame($urlBis, $url);
     }
+
+    #[Test]
+    public function it_will_return_soft_errors_when_uri_is_resolved_with_errors(): void
+    {
+        $softErrors = [];
+        $url = new Url("ftp://example.com");
+        $urlBis = $url->resolve("//user:p%61ss@example.org/💩", $softErrors);
+
+        self::assertSame('ftp://user:p%61ss@example.org/%F0%9F%92%A9', $urlBis->toUnicodeString());
+        self::assertNotEmpty($softErrors);
+        self::assertInstanceOf(UrlValidationError::class, $softErrors[0]);
+        self::assertSame(UrlValidationErrorType::InvalidCredentials, $softErrors[0]->type);
+    }
 }
