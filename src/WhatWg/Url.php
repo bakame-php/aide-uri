@@ -280,11 +280,13 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
+         * @param array<int, UrlValidationError> $softErrors
+         *
          * @throws InvalidUrlException
          */
-        public function resolve(string $uri): self
+        public function resolve(string $uri, array &$softErrors = []): self
         {
-            return new self($uri, $this->url->href);
+            return new self($uri, $this->url->href, $softErrors);
         }
 
         /**
