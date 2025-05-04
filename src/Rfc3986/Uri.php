@@ -50,13 +50,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function __construct(string $uri, ?string $baseUri = null)
+        public function __construct(string $uri, ?self $baseUri = null)
         {
-            self::assertUriContainsValidRfc3986Characters($uri);
-            self::assertUriContainsValidRfc3986Characters($baseUri);
+            UriString::containsValidRfc3986Characters($uri) || throw new InvalidUriException('The URI `'.$uri.'` contains invalid RFC3986 characters.');
 
             try {
-                $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri) : $uri;
+                $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri->toRawString()) : $uri;
                 $components = self::addUserInfo(UriString::parse($uri));
             } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
@@ -71,16 +70,6 @@ if (PHP_VERSION_ID < 80500) {
             $this->rawUri = $uri;
             $this->rawComponents = $components;
             $this->isNormalized = false;
-        }
-
-        /**
-         * @throws InvalidUriException
-         */
-        private static function assertUriContainsValidRfc3986Characters(?string $uri): void
-        {
-            null === $uri
-            || UriString::containsValidRfc3986Characters($uri)
-            || throw new InvalidUriException('The URI `'.$uri.'` contains invalid RFC3986 characters.');
         }
 
         /**
@@ -112,7 +101,7 @@ if (PHP_VERSION_ID < 80500) {
             return $components;
         }
 
-        public static function parse(string $uri, ?string $baseUri = null): ?Uri
+        public static function parse(string $uri, ?self $baseUri = null): ?Uri
         {
             try {
                 return new self($uri, $baseUri);
@@ -374,7 +363,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function resolve(string $uri): self
         {
-            return new self($uri, $this->toRawString());
+            return new self($uri, $this);
         }
 
         /**

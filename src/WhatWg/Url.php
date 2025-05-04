@@ -40,7 +40,7 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @param array<int, UrlValidationError> $errors
          */
-        public static function parse(string $uri, ?string $baseUrl = null, array &$errors = []): ?self
+        public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
         {
             try {
                 return new self($uri, $baseUrl, $errors);
@@ -56,12 +56,12 @@ if (PHP_VERSION_ID < 80500) {
          *
          * @throws InvalidUrlException
          */
-        public function __construct(string $uri, ?string $baseUrl = null, array &$softErrors = [])
+        public function __construct(string $uri, ?self $baseUrl = null, array &$softErrors = [])
         {
             $collector = new UrlValidationErrorCollector();
 
             try {
-                $this->url = new WhatWgURL($uri, $baseUrl, ['logger' => $collector]);
+                $this->url = new WhatWgURL($uri, $baseUrl?->url->href, ['logger' => $collector]);
             } catch (Exception $exception) {
                 throw new InvalidUrlException(
                     message: $exception->getMessage(),
@@ -86,6 +86,9 @@ if (PHP_VERSION_ID < 80500) {
             return substr($this->url->protocol, 0, -1);
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withScheme(string $scheme): self
         {
             $scheme = strtolower($scheme);
@@ -104,6 +107,9 @@ if (PHP_VERSION_ID < 80500) {
             return '' === $this->url->username ? null : $this->url->username;
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withUsername(?string $user): self
         {
             if ($user === $this->getUsername() || $user === $this->url->username) {
@@ -121,6 +127,9 @@ if (PHP_VERSION_ID < 80500) {
             return  '' === $this->url->password ? null : $this->url->password;
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withPassword(#[SensitiveParameter] ?string $password): self
         {
             if ($password === $this->getPassword() || $password === $this->url->password) {
@@ -153,6 +162,9 @@ if (PHP_VERSION_ID < 80500) {
             return $idn->domain();
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withHost(string $host): self
         {
             if ($host === $this->getAsciiHost() || $host === $this->getUnicodeHost()) {
@@ -170,6 +182,9 @@ if (PHP_VERSION_ID < 80500) {
             return '' === $this->url->port ? null : (int) $this->url->port;
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withPort(?int $port): self
         {
             if ($port === $this->getPort()) {
@@ -187,6 +202,9 @@ if (PHP_VERSION_ID < 80500) {
             return $this->url->pathname;
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withPath(string $path): self
         {
             if ($path === $this->url->pathname) {
@@ -209,6 +227,9 @@ if (PHP_VERSION_ID < 80500) {
             return null;
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withQuery(?string $query): self
         {
             if ($query === $this->url->search || $query === $this->getQuery()) {
@@ -231,6 +252,9 @@ if (PHP_VERSION_ID < 80500) {
             return null;
         }
 
+        /**
+         * @throws InvalidUrlException
+         */
         public function withFragment(?string $fragment): self
         {
             if ($fragment === $this->url->hash || $fragment === $this->getFragment()) {
@@ -286,7 +310,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function resolve(string $uri, array &$softErrors = []): self
         {
-            return new self($uri, $this->url->href, $softErrors);
+            return new self($uri, $this, $softErrors);
         }
 
         /**

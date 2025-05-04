@@ -195,7 +195,7 @@ final class UriTest extends TestCase
     #[Test]
     public function it_will_return_null_on_invalid_uri_parsing(): void
     {
-        self::assertNull(Uri::parse("/foo", ".com"));
+        self::assertNull(Uri::parse("/foo", Uri::parse("/relative-uri")));
     }
 
     #[Test]

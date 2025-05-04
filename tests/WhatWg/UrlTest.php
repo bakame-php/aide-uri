@@ -12,6 +12,9 @@ use Uri\UriComparisonMode;
 #[CoversClass(Url::class)]
 #[CoversClass(InvalidUrlException::class)]
 #[CoversClass(UriComparisonMode::class)]
+#[CoversClass(UrlValidationError::class)]
+#[CoversClass(UrlValidationErrorCollector::class)]
+#[CoversClass(UrlValidationErrorType::class)]
 final class UrlTest extends TestCase
 {
     #[Test]
@@ -29,7 +32,7 @@ final class UrlTest extends TestCase
     #[Test]
     public function it_will_return_null_on_invalid_url_parsing(): void
     {
-        self::assertNull(Url::parse("/foo", ".com"));
+        self::assertNull(Url::parse("/foo", Url::parse("mqilto:example.com")));
     }
 
     #[Test]
