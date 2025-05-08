@@ -32,6 +32,8 @@ if (PHP_VERSION_ID < 80500) {
      * @see https://wiki.php.net/rfc/url_parsing_api
      *
      * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
+     * @phpstan-import-type ComponentMap from UriString
+     * @phpstan-import-type InputComponentMap from UriString
      */
     final class Uri
     {
@@ -56,13 +58,12 @@ if (PHP_VERSION_ID < 80500) {
 
             try {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri->toRawString()) : $uri;
-                $components = self::addUserInfo(UriString::parse($uri));
+                $components = self::addUserInfoComponent(UriString::parse($uri));
             } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
             }
 
-            Encoder::isUserEncoded($components['user']) || throw new InvalidUriException('The encoded userInfo string component `'.$components['userInfo'].'` contains invalid characters.');
-            Encoder::isPasswordEncoded($components['pass']) || throw new InvalidUriException('The encoded userInfo component `'.$components['userInfo'].'` contains invalid characters.');
+            Encoder::isUserInfoEncoded($components['userInfo']) || throw new InvalidUriException('The encoded userInfo string component `'.$components['userInfo'].'` contains invalid characters.');
             Encoder::isPathEncoded($components['path']) || throw new InvalidUriException('The encoded path component `'.$components['path'].'` contains invalid characters.');
             Encoder::isQueryEncoded($components['query']) || throw new InvalidUriException('The encoded query string component `'.$components['query'].'` contains invalid characters.');
             Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The encoded fragment string component `'.$components['fragment'].'` contains invalid characters.');
@@ -73,26 +74,17 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * Split the URI into its own component following RFC3986 rules.
-         *
-         * @link https://tools.ietf.org/html/rfc3986
-         *
-         * @param array{scheme: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string} $parts The URI components
+         * @param ComponentMap $parts
          *
          * @return Components
          */
-        private static function addUserInfo(array $parts): array
+        private static function addUserInfoComponent(array $parts): array
         {
             $components = [...self::DEFAULT_COMPONENTS, ...$parts];
-            if (null === $components['user']) {
-                $components['pass'] = null;
-                $components['userInfo'] = null;
-
-                return $components;
-            }
-
             $components['userInfo'] = $components['user'];
-            if (null === $components['pass']) {
+            if (null === $components['user'] || null === $components['pass']) {
+                $components['pass'] = null;
+
                 return $components;
             }
 
@@ -134,14 +126,14 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             $this->normalizedComponents = [
-                ...self::addUserInfo(UriString::parseNormalized($this->rawUri)),
+                ...self::addUserInfoComponent(UriString::parseNormalized($this->rawUri)),
                 ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
             ];
             $this->isNormalized = true;
         }
 
         /**
-         * @param array{scheme?: ?string, user?: ?string, pass?: ?string, host?: ?string, port?: ?int, path?: string, query?: ?string, fragment?: ?string} $components
+         * @param InputComponentMap $components
          *
          * @throws InvalidUriException
          */
@@ -173,7 +165,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             return match (true) {
                 $scheme === $this->getRawScheme() => $this,
-                UriString::isScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
+                UriString::isValidScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
                 default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
             };
         }
@@ -197,15 +189,15 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            if (null === $userInfo) {
-                return $this->withComponent(['user' => null, 'pass' => null]);
+            Encoder::isUserInfoEncoded($userInfo) || throw new InvalidUriException('The encoded userInfo string component `'.$userInfo.'` contains invalid characters.');
+
+            $user = null;
+            $pass = null;
+            if (null !== $userInfo) {
+                [$user, $pass] = explode(':', $userInfo, 2) + [1 => null];
             }
 
-            [$user, $password] = explode(':', $userInfo, 2) + [1 => null];
-            Encoder::isUserEncoded($user) || throw new InvalidUriException('The encoded userInfo string component `'.$userInfo.'` contains invalid characters.');
-            Encoder::isPasswordEncoded($password) || throw new InvalidUriException('The encoded userInfo string component `'.$userInfo.'` contains invalid characters.');
-
-            return $this->withComponent(['user' => $user, 'pass' => $password]);
+            return $this->withComponent(['user' => $user, 'pass' => $pass]);
         }
 
         public function getRawUsername(): ?string
@@ -245,7 +237,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             return match (true) {
                 $host === $this->getRawHost() => $this,
-                UriString::isHost($host) => $this->withComponent(['host' => $host]),
+                UriString::isValidHost($host) => $this->withComponent(['host' => $host]),
                 default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
             };
         }
@@ -367,7 +359,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{0: array{uri: string}, 1: array{}}
+         * @return UriSerializedShape
          */
         public function __serialize(): array
         {
@@ -375,7 +367,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param array{0: array{uri: string}, 1: array{}} $data
+         * @param UriSerializedShape $data
          *
          * @throws Exception|InvalidUriException
          */
@@ -390,7 +382,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{scheme: ?string, username: ?string, password: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
+         * @return UriDebugShape
          */
         public function __debugInfo(): array
         {

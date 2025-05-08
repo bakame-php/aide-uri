@@ -314,7 +314,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{0: array{uri: string}, 1: array{}}
+         * @return UriSerializedShape
          */
         public function __serialize(): array
         {
@@ -322,7 +322,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param array{0: array{uri: string}, 1: array{}} $data
+         * @param UriSerializedShape $data
          *
          * @throws Exception|InvalidUrlException
          */
@@ -334,7 +334,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @return array{scheme: ?string, username: ?string, password: ?string, host: ?string, port: ?int, path: ?string, query: ?string, fragment: ?string}
+         * @return UriDebugShape
          */
         public function __debugInfo(): array
         {
