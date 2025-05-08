@@ -22,7 +22,7 @@ if (PHP_VERSION_ID < 80500) {
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      */
-    class UrlValidationError
+    final class UrlValidationError
     {
         public function __construct(
             public readonly string $context,
