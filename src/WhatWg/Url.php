@@ -38,7 +38,7 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $urlUnicodeString = null;
 
         /**
-         * @param array<int, UrlValidationError> $errors
+         * @param list<UrlValidationError> $errors
          */
         public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
         {
@@ -52,7 +52,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param array<int, UrlValidationError> $softErrors
+         * @param list<UrlValidationError> $softErrors
          *
          * @throws InvalidUrlException
          */
@@ -304,7 +304,7 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param array<int, UrlValidationError> $softErrors
+         * @param list<UrlValidationError> $softErrors
          *
          * @throws InvalidUrlException
          */
