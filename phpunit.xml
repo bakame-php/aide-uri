@@ -28,6 +28,7 @@
   <source>
     <include>
       <directory suffix=".php">src</directory>
+      <directory suffix=".php">helper</directory>
     </include>
   </source>
 </phpunit>

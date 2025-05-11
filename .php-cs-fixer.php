@@ -13,6 +13,7 @@ EOF;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/src')
+    ->in(__DIR__ . '/helper')
 ;
 
 $config = new PhpCsFixer\Config();
