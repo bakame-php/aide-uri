@@ -325,9 +325,6 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        /**
-         * @throws Exception
-         */
         public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
             return match (true) {
