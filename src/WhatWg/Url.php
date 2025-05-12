@@ -15,10 +15,12 @@ namespace Uri\WhatWg;
 
 use Bakame\Aide\Uri\UrlValidationErrorCollector;
 use Exception;
-use League\Uri\Idna\Converter;
-use League\Uri\UriString;
 use ReflectionClass;
+use ReflectionProperty;
+use Rowbot\Idna\Idna;
+use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\URL as WhatWgURL;
+use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
 
@@ -36,6 +38,8 @@ if (PHP_VERSION_ID < 80500) {
     final class Url
     {
         private WhatWgURL $url;
+        private ?string $unicodeHost = null;
+        private bool $unicodeHostInitialized = false;
         private ?string $urlUnicodeString = null;
 
         /**
@@ -150,17 +154,29 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getUnicodeHost(): ?string
         {
+            if ($this->unicodeHostInitialized) {
+                return $this->unicodeHost;
+            }
+
+            $this->unicodeHost = $this->setUnicodeHost();
+            $this->unicodeHostInitialized = true;
+
+            return $this->unicodeHost;
+        }
+
+        private function setUnicodeHost(): ?string
+        {
             $host = $this->getAsciiHost();
             if ('' === $host || null === $host) {
                 return $host;
             }
 
-            $idn = Converter::toUnicode($host);
+            $idn = Idna::toUnicode($host);
             if ($idn->hasErrors()) {
                 return $host;
             }
 
-            return $idn->domain();
+            return $idn->getDomain();
         }
 
         /**
@@ -270,16 +286,29 @@ if (PHP_VERSION_ID < 80500) {
 
         public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
-            if ($this->url->hash === $uri->url->hash || UriComparisonMode::IncludeFragment === $uriComparisonMode) {
-                return $this->url->href === $uri->url->href;
-            }
+            return match (true) {
+                $this->url->hash === $uri->url->hash,
+                UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->url->href === $uri->url->href,
+                default => self::getUrlRecord($this)->isEqual(self::getUrlRecord($uri), true),
+            };
+        }
 
-            $cloneThis = clone $this->url;
-            $cloneThis->hash = '';
-            $cloneThat = clone $uri->url;
-            $cloneThat->hash = '';
+        /**
+         * Retrieve the WHATWG URL object URLRecord property.
+         *
+         * The URLRecord is an internal representation
+         * therefore we use reflection to access it
+         */
+        private static function getUrlRecord(self $url): URLRecord
+        {
+            /** @var ?ReflectionProperty $property */
+            static $property = null;
+            $property ??= (new ReflectionClass(WhatWgURL::class))->getProperty('url');
 
-            return $cloneThis->href === $cloneThat->href;
+            /** @var URLRecord $urlRecord */
+            $urlRecord = $property->getValue($url->url);
+
+            return $urlRecord;
         }
 
         public function toAsciiString(): string
@@ -294,12 +323,15 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             $unicodeHost = $this->getUnicodeHost();
-            $this->urlUnicodeString = $this->getAsciiHost() === $unicodeHost
-                ? $this->url->href
-                : UriString::build([
-                ...UriString::parse($this->url->href),
-                ...['host' => $unicodeHost],
-            ]);
+            if (null === $unicodeHost || $this->getAsciiHost() === $unicodeHost) {
+                $this->urlUnicodeString = $this->url->href;
+
+                return $this->urlUnicodeString;
+            }
+
+            $urlRecord = self::getUrlRecord($this);
+            $urlRecord->host = new StringHost($unicodeHost);
+            $this->urlUnicodeString = $urlRecord->serializeURL();
 
             return $this->urlUnicodeString;
         }
