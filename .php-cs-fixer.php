@@ -13,7 +13,7 @@ EOF;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/src')
-    ->in(__DIR__ . '/helper')
+    ->in(__DIR__ . '/lib')
 ;
 
 $config = new PhpCsFixer\Config();

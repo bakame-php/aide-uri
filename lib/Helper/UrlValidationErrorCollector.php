@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Aide\Helper;
+namespace Bakame\Aide\Uri\Helper;
 
 use OutOfBoundsException;
 use Psr\Log\AbstractLogger;

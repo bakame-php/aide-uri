@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Uri\WhatWg;
 
-use Bakame\Aide\Helper\UrlValidationErrorCollector;
+use Bakame\Aide\Uri\Helper\UrlValidationErrorCollector;
 use Exception;
 use League\Uri\Idna\Converter;
 use League\Uri\UriString;
