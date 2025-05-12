@@ -11,12 +11,14 @@
 
 declare(strict_types=1);
 
-namespace Uri\WhatWg;
+namespace Bakame\Aide\Uri\Helper;
 
 use OutOfBoundsException;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
+use Uri\WhatWg\UrlValidationError;
+use Uri\WhatWg\UrlValidationErrorType;
 
 use function array_filter;
 use function array_values;

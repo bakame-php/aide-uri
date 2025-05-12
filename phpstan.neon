@@ -9,6 +9,7 @@ parameters:
     level: max
     paths:
         - src
+        - lib
     reportUnmatchedIgnoredErrors: true
     treatPhpDocTypesAsCertain: false
     parallel:

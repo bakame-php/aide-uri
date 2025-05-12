@@ -13,7 +13,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "Uri\\": "src"
+            "Uri\\": "src",
+            "Bakame\\Aide\\Uri\\": "lib"
         }
     },
     "autoload-dev": {

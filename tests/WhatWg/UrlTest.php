@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Uri\WhatWg;
 
+use Bakame\Aide\Uri\Helper\UrlValidationErrorCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
