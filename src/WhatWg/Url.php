@@ -39,20 +39,6 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $urlUnicodeString = null;
 
         /**
-         * @param list<UrlValidationError> $errors
-         */
-        public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
-        {
-            try {
-                return new self($uri, $baseUrl, $errors);
-            } catch (InvalidUrlException $exception) {
-                $errors = $exception->errors;
-
-                return null;
-            }
-        }
-
-        /**
          * @param list<UrlValidationError> $softErrors
          *
          * @throws InvalidUrlException
@@ -71,6 +57,20 @@ if (PHP_VERSION_ID < 80500) {
                 );
             } finally {
                 $softErrors = $collector->recoverableErrors();
+            }
+        }
+
+        /**
+         * @param list<UrlValidationError> $errors
+         */
+        public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
+        {
+            try {
+                return new self($uri, $baseUrl, $errors);
+            } catch (InvalidUrlException $exception) {
+                $errors = $exception->errors;
+
+                return null;
             }
         }
 

@@ -148,14 +148,14 @@ if (PHP_VERSION_ID < 80500) {
             return new self($uri);
         }
 
-        public function getScheme(): ?string
-        {
-            return $this->getComponent(self::TYPE_NORMALIZED, 'scheme');
-        }
-
         public function getRawScheme(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'scheme');
+        }
+
+        public function getScheme(): ?string
+        {
+            return $this->getComponent(self::TYPE_NORMALIZED, 'scheme');
         }
 
         /**
@@ -170,14 +170,14 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        public function getUserInfo(): ?string
-        {
-            return $this->getComponent(self::TYPE_NORMALIZED, 'userInfo');
-        }
-
         public function getRawUserInfo(): ?string
         {
             return $this->getComponent(self::TYPE_RAW, 'userInfo');
+        }
+
+        public function getUserInfo(): ?string
+        {
+            return $this->getComponent(self::TYPE_NORMALIZED, 'userInfo');
         }
 
         /**
