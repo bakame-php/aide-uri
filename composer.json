@@ -12,10 +12,8 @@
         }
     ],
     "autoload": {
-        "psr-4": {
-            "Uri\\": "src",
-            "Bakame\\Aide\\Uri\\": "lib"
-        }
+        "psr-4": {"Bakame\\Aide\\Uri\\": "lib"},
+        "classmap": ["src"]
     },
     "autoload-dev": {
         "psr-4": {
