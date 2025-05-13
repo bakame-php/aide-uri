@@ -49,6 +49,15 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $normalizedUri = null;
         private bool $isNormalized;
 
+        public static function parse(string $uri, ?self $baseUri = null): ?Uri
+        {
+            try {
+                return new self($uri, $baseUri);
+            } catch (Exception) {
+                return null;
+            }
+        }
+
         /**
          * @throws InvalidUriException
          */
@@ -91,15 +100,6 @@ if (PHP_VERSION_ID < 80500) {
             $components['userInfo'] .= ':'.$components['pass'];
 
             return $components;
-        }
-
-        public static function parse(string $uri, ?self $baseUri = null): ?Uri
-        {
-            try {
-                return new self($uri, $baseUri);
-            } catch (Exception) {
-                return null;
-            }
         }
 
         /**

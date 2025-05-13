@@ -44,6 +44,20 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $urlUnicodeString = null;
 
         /**
+         * @param list<UrlValidationError> $errors
+         */
+        public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
+        {
+            try {
+                return new self($uri, $baseUrl, $errors);
+            } catch (InvalidUrlException $exception) {
+                $errors = $exception->errors;
+
+                return null;
+            }
+        }
+
+        /**
          * @param list<UrlValidationError> $softErrors
          *
          * @throws InvalidUrlException
@@ -65,24 +79,11 @@ if (PHP_VERSION_ID < 80500) {
             }
         }
 
-        /**
-         * @param list<UrlValidationError> $errors
-         */
-        public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
-        {
-            try {
-                return new self($uri, $baseUrl, $errors);
-            } catch (InvalidUrlException $exception) {
-                $errors = $exception->errors;
-
-                return null;
-            }
-        }
-
         private function copy(): self
         {
             $newInstance = (new ReflectionClass(self::class))->newInstanceWithoutConstructor();
             $newInstance->url = clone $this->url;
+
             return $newInstance;
         }
 
@@ -115,14 +116,14 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUrlException
          */
-        public function withUsername(?string $user): self
+        public function withUsername(?string $username): self
         {
-            if ($user === $this->getUsername() || $user === $this->url->username) {
+            if ($username === $this->getUsername() || $username === $this->url->username) {
                 return $this;
             }
 
             $copy = $this->copy();
-            $copy->url->username = (string) $user;
+            $copy->url->username = (string) $username;
 
             return $copy;
         }
@@ -284,12 +285,12 @@ if (PHP_VERSION_ID < 80500) {
             return $copy;
         }
 
-        public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
+        public function equals(self $url, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
             return match (true) {
-                $this->url->hash === $uri->url->hash,
-                UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->url->href === $uri->url->href,
-                default => self::getUrlRecord($this)->isEqual(self::getUrlRecord($uri), true),
+                $this->url->hash === $url->url->hash,
+                UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->url->href === $url->url->href,
+                default => self::getUrlRecord($this)->isEqual(self::getUrlRecord($url), true),
             };
         }
 
