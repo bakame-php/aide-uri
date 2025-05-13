@@ -24,6 +24,7 @@ use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
 
+use function in_array;
 use function substr;
 
 use const PHP_VERSION_ID;
@@ -82,6 +83,9 @@ if (PHP_VERSION_ID < 80500) {
         {
             $newInstance = (new ReflectionClass(self::class))->newInstanceWithoutConstructor();
             $newInstance->url = clone $this->url;
+            $newInstance->unicodeHost = null;
+            $newInstance->unicodeHostInitialized = false;
+            $newInstance->urlUnicodeString = null;
 
             return $newInstance;
         }
@@ -184,7 +188,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withHost(string $host): self
         {
-            if ($host === $this->getAsciiHost() || $host === $this->getUnicodeHost()) {
+            if (in_array($host, [$this->url->hostname, $this->getAsciiHost(), $this->getUnicodeHost()], true)) {
                 return $this;
             }
 
