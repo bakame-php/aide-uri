@@ -83,10 +83,6 @@ if (PHP_VERSION_ID < 80500) {
         {
             $newInstance = (new ReflectionClass(self::class))->newInstanceWithoutConstructor();
             $newInstance->url = clone $this->url;
-            $newInstance->unicodeHost = null;
-            $newInstance->unicodeHostInitialized = false;
-            $newInstance->urlUnicodeString = null;
-
             return $newInstance;
         }
 
