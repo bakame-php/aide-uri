@@ -10,13 +10,8 @@ echo $url->toAsciiString();   // returns "https://xn--go8h.com/bar/baz?#fragment
 echo $url->toUnicodeString(); // returns "https://🐘.com/bar/baz?#fragment"
 ````
 
-This package provides a PHP polyfill for PHP version greater or equal to **PHP8.1** to the new
-native PHP URI parsing features that are in discussion to be included in **PHP8.5**.
-
-The RFC introduces:
-
-- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser via the new `Uri\Rfc3986\Uri` class
-- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parser via the new `Uri\WhatWg\Url` class
+This package provides a polyfill for PHP version greater or equal to **PHP8.1** to the new
+native PHP URI parsing features in [voting phase](https://wiki.php.net/rfc/url_parsing_api#vote) to be included in **PHP8.5**.
 
 ## System Requirements
 
@@ -26,15 +21,23 @@ To use the package you are required to use:
 - [League URI Interfaces](https://github.com/thephpleague/uri-interfaces) and its dependencies
 - [URL-Parser](https://github.com/TRowbotham/URL-Parser) and its dependencies
 
+> [!TIP]
+> You should install `symfony/polyfill-php82` to use its `SensitiveParameter` polyfill if you are using **PHP 8.1**
+
 ## Install
 
-Install `aidre-uri` using Composer.
+Install `aide-uri` using Composer.
 
 ```bash
 composer require bakame/aide-uri:dev-main
 ```
 
 ## Documentation
+
+The RFC introduces:
+
+- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser via the new `Uri\Rfc3986\Uri` class
+- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parser via the new `Uri\WhatWg\Url` class
 
 Full documentation can be found on the [Add RFC 3986 and WHATWG compliant URI parsing support RFC](https://wiki.php.net/rfc/url_parsing_api).
 

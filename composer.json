@@ -1,6 +1,6 @@
 {
     "name": "bakame/aide-uri",
-    "description": "URI polyfill for PHP native RFC3986/WHATWG URI classes",
+    "description": "Polyfill backporting PHP 8.5+ native RFC3986/WHATWG URI features to lower PHP versions",
     "keywords": ["uri", "url", "rfc3986", "whatwg", "polyfill", "parser", "resolver", "equivalence", "compatibiliy", "portable"],
     "license": "MIT",
     "authors": [
@@ -35,6 +35,9 @@
         "phpbench/phpbench": "^1.4.1",
         "symfony/var-dumper": "^v6.4.21 || ^7.2.6"
     },
+    "suggest": {
+        "symfony/polyfill-php82": "To use the SensitiveParameter polyfill in PHP8.1"
+    },
     "scripts": {
         "benchmark": "phpbench run --report=default",
         "phpcs": "php-cs-fixer fix --dry-run --diff -vvv --allow-risky=yes --ansi",
@@ -49,11 +52,11 @@
         ]
     },
     "scripts-descriptions": {
-        "benchmark": "Runs parser benchmark",
+        "benchmark": "Runs URI and URL classes benchmark",
         "phpstan": "Runs complete codebase static analysis",
         "phpunit": "Runs unit and functional testing",
         "phpcs": "Runs coding style testing",
         "phpcs:fix": "Fix coding style issues",
-        "test": "Runs all tests"
+        "test": "Runs all tests (excluding the benchmark)"
     }
 }
