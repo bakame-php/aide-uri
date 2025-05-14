@@ -34,6 +34,8 @@ if (PHP_VERSION_ID < 80500) {
      * @phpstan-type Components array{scheme: ?string, userInfo: ?string, user: ?string, pass: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
      * @phpstan-import-type ComponentMap from UriString
      * @phpstan-import-type InputComponentMap from UriString
+     * @phpstan-import-type UriSerializedShape from UriComparisonMode
+     * @phpstan-import-type UriDebugShape from UriComparisonMode
      */
     final class Uri
     {

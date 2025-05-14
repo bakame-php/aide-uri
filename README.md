@@ -1,4 +1,4 @@
-# PHP new native URI parsing feature polyfill
+# URI parsing polyfill for PHP8.1+
 
 ````php
 $uri = new Uri\Rfc3986\Uri("HTTPS://ex%61mpLE.com:443/foo/../bar/./baz?#fragment");
@@ -15,14 +15,14 @@ native PHP URI parsing features in [voting phase](https://wiki.php.net/rfc/url_p
 
 ## System Requirements
 
-To use the package you are required to use:
+To use the package, you should require:
 
 - **PHP >= 8.1** but the latest stable version of PHP is recommended
 - [League URI Interfaces](https://github.com/thephpleague/uri-interfaces) and its dependencies
 - [URL-Parser](https://github.com/TRowbotham/URL-Parser) and its dependencies
 
 > [!TIP]
-> You should install `symfony/polyfill-php82` to use its `SensitiveParameter` polyfill if you are using **PHP 8.1**
+> If you are using **PHP 8.1**, you SHOULD install `symfony/polyfill-php82` to use its `SensitiveParameter` polyfill 
 
 ## Install
 
@@ -36,8 +36,8 @@ composer require bakame/aide-uri:dev-main
 
 The RFC introduces:
 
-- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser via the new `Uri\Rfc3986\Uri` class
-- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parser via the new `Uri\WhatWg\Url` class
+- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser via the `Uri\Rfc3986\Uri` class
+- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parser via the `Uri\WhatWg\Url` class
 
 Full documentation can be found on the [Add RFC 3986 and WHATWG compliant URI parsing support RFC](https://wiki.php.net/rfc/url_parsing_api).
 

@@ -26,13 +26,8 @@ use function is_scalar;
 use function is_string;
 
 /**
- * @internal
- *
  * This class allows collecting WHATWG errors emitted by \Rowbot\URL\URL
- * and converts them into \Uri\WhatWg\UrlValidationError instances
- *
- * This class IS NOT PART of the RFC public API but is needed to
- * implement the polyfill against the \Rowbot\URL\URL package
+ * and converts them into \Uri\WhatWg\UrlValidationError instances.
  */
 final class UrlValidationErrorCollector extends AbstractLogger
 {

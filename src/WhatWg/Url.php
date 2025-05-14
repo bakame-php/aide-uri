@@ -35,6 +35,9 @@ if (PHP_VERSION_ID < 80500) {
      * in the PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
+     *
+     * @phpstan-import-type UriSerializedShape from UriComparisonMode
+     * @phpstan-import-type UriDebugShape from UriComparisonMode
      */
     final class Url
     {
@@ -237,12 +240,7 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getQuery(): ?string
         {
-            $query = $this->url->search;
-            if ('' !== $query) {
-                return substr($query, 1);
-            }
-
-            return null;
+            return '' === $this->url->search ? null : substr($this->url->search, 1);
         }
 
         /**
@@ -262,12 +260,7 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getFragment(): ?string
         {
-            $fragment = $this->url->hash;
-            if ('' !== $fragment) {
-                return substr($fragment, 1);
-            }
-
-            return null;
+            return '' === $this->url->hash ? null : substr($this->url->hash, 1);
         }
 
         /**
@@ -290,17 +283,17 @@ if (PHP_VERSION_ID < 80500) {
             return match (true) {
                 $this->url->hash === $url->url->hash,
                 UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->url->href === $url->url->href,
-                default => self::getUrlRecord($this)->isEqual(self::getUrlRecord($url), true),
+                default => self::urlRecord($this)->isEqual(self::urlRecord($url), true),
             };
         }
 
         /**
          * Retrieve the WHATWG URL object URLRecord property.
          *
-         * The URLRecord is an internal representation
-         * therefore we use reflection to access it
+         * The URLRecord is an internal representation;
+         * therefore, we use reflection to access it
          */
-        private static function getUrlRecord(self $url): URLRecord
+        private static function urlRecord(self $url): URLRecord
         {
             /** @var ?ReflectionProperty $property */
             static $property = null;
@@ -330,7 +323,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this->urlUnicodeString;
             }
 
-            $urlRecord = self::getUrlRecord($this);
+            $urlRecord = self::urlRecord($this);
             $urlRecord->host = new StringHost($unicodeHost);
             $this->urlUnicodeString = $urlRecord->serializeURL();
 

@@ -21,6 +21,9 @@ if (PHP_VERSION_ID < 80500) {
      * in the PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
+     *
+     * @phpstan-type UriDebugShape array{scheme: ?string, username: ?string, password: ?string, host: ?string, port: ?int, path: string, query: ?string, fragment: ?string}
+     * @phpstan-type UriSerializedShape array{0: array{uri: string}, 1: array{}}
      */
     enum UriComparisonMode
     {
