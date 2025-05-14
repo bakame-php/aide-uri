@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Bakame\Aide\Uri;
 
-use OutOfBoundsException;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
 use Uri\WhatWg\UrlValidationError;
 use Uri\WhatWg\UrlValidationErrorType;
+use ValueError;
 
 use function array_filter;
 use function array_values;
@@ -85,8 +85,8 @@ final class UrlValidationErrorCollector extends AbstractLogger
             $errorContext,
             // \Rowbot\URL\URL makes no usage of string interpolation
             // the message is a string representing one of
-            // the defined \Uri\WhatWg\UrlValidationErrorType case
-            // mapping is done using https://url.spec.whatwg.org/#writing
+            // \Uri\WhatWg\UrlValidationErrorType case
+            // defined in https://url.spec.whatwg.org/#writing
             match ((string) $message) {
                 // IDNA Error Tyoe
                 'domain-to-ASCII' => UrlValidationErrorType::DomainToAscii,
@@ -120,7 +120,7 @@ final class UrlValidationErrorCollector extends AbstractLogger
                 'port-invalid' => UrlValidationErrorType::PortInvalid,
                 'file-invalid-Windows-drive-letter-host' => UrlValidationErrorType::FileInvalidWindowsDriveLetterHost,
                 'file-invalid-Windows-drive-letter' => UrlValidationErrorType::FileInvalidWindowsDriveLetter,
-                default  => throw new OutOfBoundsException('unknown error type:'.$message),
+                default  => throw new ValueError('unknown error type:'.$message),
             },
             // \Rowbot\URL\URL emits LogLevel::WARNING when the error is a failure
             // otherwise LogLevel::NOTICE is used
