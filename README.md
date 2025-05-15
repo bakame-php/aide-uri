@@ -15,18 +15,18 @@ native PHP URI parsing features in [voting phase](https://wiki.php.net/rfc/url_p
 
 ## System Requirements
 
-To use the package, you should require:
+To use the package, you require:
 
 - **PHP >= 8.1** but the latest stable version of PHP is recommended
-- [League URI Interfaces](https://github.com/thephpleague/uri-interfaces) and its dependencies
-- [URL-Parser](https://github.com/TRowbotham/URL-Parser) and its dependencies
+- [league/uri-interfaces](https://github.com/thephpleague/uri-interfaces)
+- [rowbot/url](https://github.com/TRowbotham/URL-Parser)
 
 > [!TIP]
-> If you are using **PHP 8.1**, you SHOULD install `symfony/polyfill-php82` to use its `SensitiveParameter` polyfill 
+> If you are using **PHP 8.1**, you **SHOULD** install `symfony/polyfill-php82` to use its `SensitiveParameter` polyfill 
 
 ## Install
 
-Install `aide-uri` using Composer.
+Install the package using Composer.
 
 ```bash
 composer require bakame/aide-uri:dev-main
@@ -36,21 +36,21 @@ composer require bakame/aide-uri:dev-main
 
 The RFC introduces:
 
-- an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser via the `Uri\Rfc3986\Uri` class
-- an [WHATWG URL](https://url.spec.whatwg.org/) compliant parser via the `Uri\WhatWg\Url` class
+- the `Uri\Rfc3986\Uri` class, an [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) compliant URI parser
+- the `Uri\WhatWg\Url` class, an [WHATWG](https://url.spec.whatwg.org/) compliant URL parser
 
 Full documentation can be found on the [Add RFC 3986 and WHATWG compliant URI parsing support RFC](https://wiki.php.net/rfc/url_parsing_api).
 
 ## Testing
 
-The URI polyfill has:
+The package has:
 
 - a [PHPUnit](https://phpunit.de) test suite
 - a code analysis compliance test suite using [PHPStan](https://github.com/phpstan/phpstan).
 - a coding style compliance test suite using [PHP CS Fixer](http://cs.sensiolabs.org/).
 - a benchmark using [PHP Bench](https://github.com/phpbench/phpbench).
 
-To run the tests, run the following command from the project folder .
+To run the tests, run the following command from the project root folder.
 
 ``` bash
 composer test
