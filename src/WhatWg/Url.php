@@ -168,6 +168,11 @@ if (PHP_VERSION_ID < 80500) {
             return $this->unicodeHost;
         }
 
+        /**
+         * Set the domain to its Unicode value according to the WHATWG URL spec.
+         *
+         * @see https://url.spec.whatwg.org/#concept-domain-to-unicode
+         */
         private function setUnicodeHost(): ?string
         {
             $host = $this->getAsciiHost();
@@ -175,12 +180,20 @@ if (PHP_VERSION_ID < 80500) {
                 return $host;
             }
 
-            $idn = Idna::toUnicode($host);
-            if ($idn->hasErrors()) {
+            $result = Idna::toUnicode($host, [
+                'CheckHyphens' => false, // should be false for display in the browser
+                'CheckBidi' => true,
+                'CheckJoiners' => true,
+                'UseSTD3ASCIIRules' => false,  // should be false for display in the browser
+                'Transitional_Processing' => false,
+                'IgnoreInvalidPunycode' => false,
+            ]);
+
+            if ($result->hasErrors()) {
                 return $host;
             }
 
-            return $idn->getDomain();
+            return $result->getDomain();
         }
 
         /**

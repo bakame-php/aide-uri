@@ -250,4 +250,22 @@ final class UrlTest extends TestCase
         self::assertInstanceOf(UrlValidationError::class, $softErrors[0]);
         self::assertSame(UrlValidationErrorType::InvalidCredentials, $softErrors[0]->type);
     }
+
+    #[Test]
+    public function it_can_update_the_password_separately(): void
+    {
+        $uri = new Url("https://user@example.com");
+        $res = $uri->withPassword("password");
+
+        self::assertSame("https://user:password@example.com/", $res->toAsciiString());
+    }
+
+    #[Test]
+    public function it_can_update_the_username_separately(): void
+    {
+        $uri = new Url("https://:password@example.com");
+        $res = $uri->withUsername("user");
+
+        self::assertSame("https://user:password@example.com/", $res->toAsciiString());
+    }
 }
