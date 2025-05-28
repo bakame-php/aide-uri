@@ -10,8 +10,9 @@ echo $url->toAsciiString();   // returns "https://xn--go8h.com/bar/baz?#fragment
 echo $url->toUnicodeString(); // returns "https://🐘.com/bar/baz?#fragment"
 ````
 
-This package provides a polyfill for PHP version greater or equal to **PHP8.1** to the new
-native PHP URI parsing features in [voting phase](https://wiki.php.net/rfc/url_parsing_api#vote) to be included in **PHP8.5**.
+This package provides a polyfill for the new native PHP URI
+parsing features to be included in **PHP8.5**. The polyfill
+works for PHP versions greater or equal to **PHP8.1**
 
 ## System Requirements
 

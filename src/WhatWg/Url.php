@@ -181,10 +181,10 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             $result = Idna::toUnicode($host, [
-                'CheckHyphens' => false, // should be false for display in the browser
+                'CheckHyphens' => false,
                 'CheckBidi' => true,
                 'CheckJoiners' => true,
-                'UseSTD3ASCIIRules' => false,  // should be false for display in the browser
+                'UseSTD3ASCIIRules' => false,
                 'Transitional_Processing' => false,
                 'IgnoreInvalidPunycode' => false,
             ]);
