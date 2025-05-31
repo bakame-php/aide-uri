@@ -16,6 +16,8 @@ namespace Uri\WhatWg;
 use Exception;
 use Uri\InvalidUriException;
 
+use function array_values;
+
 use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80500) {
@@ -37,7 +39,9 @@ if (PHP_VERSION_ID < 80500) {
         {
             parent::__construct($message, $code, $previous);
 
-            $this->errors = $errors;
+            $filter = static fn (UrlValidationError ...$errors): array => $errors;
+
+            $this->errors = array_values($filter(...$errors));
         }
     }
 }
