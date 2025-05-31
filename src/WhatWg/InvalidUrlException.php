@@ -15,8 +15,9 @@ namespace Uri\WhatWg;
 
 use Exception;
 use Uri\InvalidUriException;
+use ValueError;
 
-use function array_values;
+use function array_is_list;
 
 use const PHP_VERSION_ID;
 
@@ -39,9 +40,16 @@ if (PHP_VERSION_ID < 80500) {
         {
             parent::__construct($message, $code, $previous);
 
-            $filter = static fn (UrlValidationError ...$errors): array => $errors;
+            if (!array_is_list($errors)) {
+                throw new ValueError('the error argument must be a list.');
+            }
 
-            $this->errors = array_values($filter(...$errors));
+            $filter = static fn (mixed $error): bool => $error instanceof UrlValidationError;
+            if ($errors !== array_filter($errors, $filter)) {
+                throw new ValueError('the error argument must be a list containing only '.UrlValidationError::class);
+            }
+
+            $this->errors = $errors;
         }
     }
 }
