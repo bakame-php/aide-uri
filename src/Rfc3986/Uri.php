@@ -26,8 +26,8 @@ use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80500) {
     /**
-     * This is a user-land polyfill to the native Uri\Rfc3986\Uri class proposed
-     * in the PHP RFC: Add RFC 3986 and WHATWG compliant URI parsing support.
+     * This is a user-land polyfill to the native Uri\Rfc3986\Uri class
+     * to be included in PHP8.5.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      *
