@@ -17,8 +17,7 @@ use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80500) {
     /**
-     * This is a user-land polyfill to the native Uri\UriComparisonMode Enum
-     * to be included in PHP8.5.
+     * This is a user-land polyfill to the native Uri\UriComparisonMode Enum included in PHP8.5.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      *

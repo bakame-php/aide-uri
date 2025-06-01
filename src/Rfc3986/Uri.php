@@ -26,8 +26,7 @@ use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80500) {
     /**
-     * This is a user-land polyfill to the native Uri\Rfc3986\Uri class
-     * to be included in PHP8.5.
+     * This is a user-land polyfill to the native Uri\Rfc3986\Uri class included in PHP8.5.
      *
      * @see https://wiki.php.net/rfc/url_parsing_api
      *
