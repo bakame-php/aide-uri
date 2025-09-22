@@ -1,3 +1,7 @@
+> [!WARNING]
+> This package is archived, please use [League URI Polyfill](https://github.com/thephpleague/uri-polyfill) instead which
+> is maintained and is the more stable version.
+
 # URI parsing polyfill for PHP8.1+
 
 ````php
